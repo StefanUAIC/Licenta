@@ -172,3 +172,6 @@ svelteApp/.idea/inspectionProfiles/Project_Default.xml
 svelteApp/.idea/modules.xml
 svelteApp/.idea/svelteApp.iml
 svelteApp/.idea/vcs.xml
+djangoApp/.idea/djangoApp.iml
+djangoApp/.idea/djangoApp.iml
+djangoApp/.idea/misc.xml

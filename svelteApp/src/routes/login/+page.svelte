@@ -8,7 +8,6 @@
         try {
             const response = await login(username, password);
             console.log('Logged in:', response);
-            // Redirect or perform any post-login actions
         } catch (err) {
             if (err instanceof Error) {
                 error = err.message;

@@ -7,10 +7,10 @@ from rest_framework.authtoken.models import Token
 
 User = get_user_model()
 
-api = Router()
+user_router = Router()
 
 
-@api.post('/register', response=TokenSchema)
+@user_router.post('/register', response=TokenSchema)
 def register(request, user_in: UserSchema):
     try:
         with transaction.atomic():
@@ -36,7 +36,7 @@ def register(request, user_in: UserSchema):
         return {"error": str(e)}, 500
 
 
-@api.post('/login', response=TokenSchema)
+@user_router.post('/login', response=TokenSchema)
 def login(request, user_in: UserSchema):
     user = authenticate(username=user_in.username, password=user_in.password)
     if not user:

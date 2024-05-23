@@ -48,6 +48,7 @@ INSTALLED_APPS += [
 
 INSTALLED_APPS += [
     'users',
+    'code_submission'
 ]
 
 INSTALLED_APPS += [
@@ -68,6 +69,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -75,13 +77,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-MIDDLEWARE += [
-    'corsheaders.middleware.CorsMiddleware',
-]
+load_dotenv()
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
+    os.getenv('FRONTEND_URL'),
+    os.getenv('FRONTEND_ALTERNATE_URL')
 ]
 
 ROOT_URLCONF = 'src.urls'
@@ -107,8 +107,6 @@ WSGI_APPLICATION = 'src.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-
-load_dotenv()
 
 DATABASES = {
     'default': {
