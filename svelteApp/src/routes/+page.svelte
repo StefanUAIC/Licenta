@@ -13,8 +13,8 @@
     passed?: boolean;
   }
 
-  let source_code: string = `print("Hello, World!")`;
-  let language_id: number = 71;
+  let source_code: string = `printf("Hello, World!")`;
+  let language_id: number = 54;
   let testCases = writable<TestCase[]>([{ input: '', expectedOutput: '' }]);
   let result = writable<null | TestCase[]>(null);
   let loading = writable<boolean>(false);
