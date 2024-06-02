@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 ]
 
 INSTALLED_APPS += [
+    'ninja',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
@@ -48,11 +49,9 @@ INSTALLED_APPS += [
 
 INSTALLED_APPS += [
     'users',
+    'classes',
+    'problems',
     'code_submission'
-]
-
-INSTALLED_APPS += [
-    'ninja',
 ]
 
 AUTH_USER_MODEL = 'users.User'
