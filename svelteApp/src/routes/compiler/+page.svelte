@@ -73,55 +73,57 @@ int main()
 </script>
 
 <main class="p-8 bg-gray-100 min-h-screen">
-	<h1 class="text-3xl font-bold mb-4">Judge0 Code Submission</h1>
-	<AceEditor bind:code={source_code} />
+	<div class="container mx-auto">
+		<h1 class="text-3xl font-bold mb-4">Judge0 Code Submission</h1>
+		<AceEditor bind:code={source_code} />
 
-	<div class="mb-4">
-		<h2 class="text-xl font-semibold">
-			Passed Test Cases: {$passedCount} / {$testCases.length}
-		</h2>
-	</div>
-
-	{#each $testCases as testCase, index}
 		<div class="mb-4">
-			<h2 class="text-xl font-semibold">Test Case {index + 1}</h2>
-			<textarea
-				class="w-full p-2 mb-2 border rounded-lg"
-				bind:value={testCase.input}
-				rows="3"
-				placeholder="Input"
-			></textarea>
-			<textarea
-				class="w-full p-2 mb-2 border rounded-lg"
-				bind:value={testCase.expectedOutput}
-				rows="3"
-				placeholder="Expected Output"
-			></textarea>
+			<h2 class="text-xl font-semibold">
+				Passed Test Cases: {$passedCount} / {$testCases.length}
+			</h2>
 		</div>
-	{/each}
 
-	<button class="btn btn-secondary mb-4" on:click={addTestCase}>Add Test Case</button>
-	<button class="btn btn-primary mb-4" on:click={submitCode}>Submit Code</button>
+		{#each $testCases as testCase, index}
+			<div class="mb-4">
+				<h2 class="text-xl font-semibold">Test Case {index + 1}</h2>
+				<textarea
+					class="w-full p-2 mb-2 border rounded-lg"
+					bind:value={testCase.input}
+					rows="3"
+					placeholder="Input"
+				></textarea>
+				<textarea
+					class="w-full p-2 mb-2 border rounded-lg"
+					bind:value={testCase.expectedOutput}
+					rows="3"
+					placeholder="Expected Output"
+				></textarea>
+			</div>
+		{/each}
 
-	{#if $loading}
-		<p class="text-blue-500">Loading...</p>
-	{/if}
+		<button class="btn btn-secondary mb-4" on:click={addTestCase}>Add Test Case</button>
+		<button class="btn btn-primary mb-4" on:click={submitCode}>Submit Code</button>
 
-	{#if $result}
-		<h2 class="text-2xl font-semibold mt-4">Results:</h2>
-		<div>
-			{#each $result as testCase, index}
-				<div class="p-4 bg-white border rounded-lg mb-4">
-					<h3 class="text-xl font-semibold">Test Case {index + 1}</h3>
-					<p><strong>Input:</strong> {testCase.input}</p>
-					<p><strong>Expected Output:</strong> {testCase.expectedOutput}</p>
-					<p><strong>Actual Output:</strong> {testCase.actualOutput}</p>
-					<p><strong>Status:</strong> {testCase.status}</p>
-					<p><strong>Passed:</strong> {testCase.passed ? 'Yes' : 'No'}</p>
-				</div>
-			{/each}
-		</div>
-	{/if}
+		{#if $loading}
+			<p class="text-blue-500">Loading...</p>
+		{/if}
+
+		{#if $result}
+			<h2 class="text-2xl font-semibold mt-4">Results:</h2>
+			<div>
+				{#each $result as testCase, index}
+					<div class="p-4 bg-white border rounded-lg mb-4">
+						<h3 class="text-xl font-semibold">Test Case {index + 1}</h3>
+						<p><strong>Input:</strong> {testCase.input}</p>
+						<p><strong>Expected Output:</strong> {testCase.expectedOutput}</p>
+						<p><strong>Actual Output:</strong> {testCase.actualOutput}</p>
+						<p><strong>Status:</strong> {testCase.status}</p>
+						<p><strong>Passed:</strong> {testCase.passed ? 'Yes' : 'No'}</p>
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
 </main>
 
 <style>
