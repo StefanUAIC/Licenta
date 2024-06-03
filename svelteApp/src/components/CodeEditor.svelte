@@ -32,7 +32,7 @@
 <style>
   .editor {
     width: 100%;
-    height: 400px; /* Set the desired height */
+    height: 400px;
     border: 1px solid #ccc;
     border-radius: 5px;
   }
