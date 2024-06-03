@@ -1,10 +1,10 @@
+from ninja import Router
+from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
-from ninja import Router
-from rest_framework.authtoken.models import Token
 
-from .schemas import UserSchema, TokenSchema, ErrorResponseSchema, LoginSchema
+from .schemas import UserSchema, TokenSchema, ErrorResponseSchema, ErrorDetailSchema, LoginSchema
 
 User = get_user_model()
 
@@ -15,11 +15,15 @@ user_router = Router(tags=["Users"])
 def register(request, user_in: UserSchema):
     try:
         with transaction.atomic():
+            errors = []
             if User.objects.filter(username=user_in.username).exists():
-                return 409, {"error": "Username already exists"}
+                errors.append(ErrorDetailSchema(field="username", message="Username already exists"))
 
             if User.objects.filter(email=user_in.email).exists():
-                return 409, {"error": "Email already exists"}
+                errors.append(ErrorDetailSchema(field="email", message="Email already exists"))
+
+            if errors:
+                return 409, {"errors": errors}
 
             user = User.objects.create(
                 username=user_in.username,
@@ -29,8 +33,9 @@ def register(request, user_in: UserSchema):
                 first_name=user_in.first_name,
                 last_name=user_in.last_name
             )
+            user.save()
             token, _ = Token.objects.get_or_create(user=user)
-            return TokenSchema(
+            return 200, TokenSchema(
                 token=token.key,
                 user_id=user.id,
                 username=user.username,
@@ -40,7 +45,7 @@ def register(request, user_in: UserSchema):
                 last_name=user.last_name
             )
     except Exception as e:
-        return 500, {"error": str(e)}
+        return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
 @user_router.post('/login', response={200: TokenSchema, 401: ErrorResponseSchema, 500: ErrorResponseSchema})
@@ -48,10 +53,10 @@ def login(request, user_in: LoginSchema):
     try:
         user = authenticate(username=user_in.username, password=user_in.password)
         if not user:
-            return 401, {"error": "Invalid credentials"}
+            return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message="Invalid credentials")]}
 
         token, _ = Token.objects.get_or_create(user=user)
-        return TokenSchema(
+        return 200, TokenSchema(
             token=token.key,
             user_id=user.id,
             username=user.username,
@@ -61,28 +66,28 @@ def login(request, user_in: LoginSchema):
             last_name=user.last_name
         )
     except Exception as e:
-        return 500, {"error": str(e)}
+        return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
 @user_router.get('/logout', response={200: dict, 401: ErrorResponseSchema})
 def logout(request):
     try:
-        request.user.auth_token.delete()
+        request.User.auth_token.delete()
         return 200, {}
     except Exception as e:
-        return 401, {"error": str(e)}
+        return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
 @user_router.get('/profile', response={200: UserSchema, 401: ErrorResponseSchema})
 def profile(request):
     try:
         user = request.user
-        return UserSchema(
+        return 200, UserSchema(
             username=user.username,
-            role=user.role,
+            role=User.role,
             email=user.email,
             first_name=user.first_name,
             last_name=user.last_name
         )
     except Exception as e:
-        return 401, {"error": str(e)}
+        return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}

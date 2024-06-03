@@ -5,7 +5,7 @@
 
 	let username = '';
 	let password = '';
-	let error = '';
+	let errors = '';
 	let passwordVisible = false;
 	let passwordFocused = false;
 
@@ -13,11 +13,16 @@
 		try {
 			const response = await login(username, password);
 			console.log('Logged in:', response);
+			// Clear the error if login is successful
+			errors = '';
 		} catch (err) {
-			if (err instanceof Error) {
-				error = err.message;
+			console.log('Error:', err);
+			if (Array.isArray(err)) {
+				err.forEach((error: { field: string; message: string }) => {
+					errors = `${error.message}`;
+				});
 			} else {
-				error = 'An unexpected error occurred';
+				errors = `An unexpected error occurred`;
 			}
 		}
 	};
@@ -45,8 +50,8 @@
 <main class="flex items-center justify-center min-h-screen bg-gray-100">
 	<div class="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-md">
 		<h1 class="text-2xl font-bold text-center">Login</h1>
-		{#if error}
-			<p class="text-red-500 text-center">{error}</p>
+		{#if errors}
+			<p class="text-red-500 text-center">{errors}</p>
 		{/if}
 		<form on:submit|preventDefault={handleLogin} class="space-y-4">
 			<div>

@@ -11,7 +11,7 @@ class RoleEnum(str, Enum):
 
 
 class UserSchema(Schema):
-    username: constr(min_length=8, max_length=30, pattern=r'^[a-zA-Z0-9_]*$')
+    username: constr(min_length=5, max_length=30, pattern=r'^[a-zA-Z0-9_]*$')
     password: constr(min_length=8, max_length=30, pattern=r'^[a-zA-Z0-9_@$!%*?&]*$')
     role: RoleEnum
     email: EmailStr
@@ -41,5 +41,9 @@ class TokenSchema(Schema):
     user_id: int
 
 
+class ErrorDetailSchema(Schema):
+    field: str
+    message: str
+
 class ErrorResponseSchema(Schema):
-    error: str
+    errors: list[ErrorDetailSchema]
