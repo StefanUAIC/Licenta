@@ -1,14 +1,6 @@
-from datetime import datetime
 from typing import List
 
 from ninja import Schema
-from pydantic import field_validator
-
-
-class CreateSolutionSchema(Schema):
-    problem_id: int
-    code: str
-    language_id: int = 71
 
 
 class CodeSubmissionSchema(Schema):

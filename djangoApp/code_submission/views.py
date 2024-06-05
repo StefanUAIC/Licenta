@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from ninja import Router
 
 from problems.models import Problem, TestCase
-from solutions.models import Solution
+from solutions.helpers import create_solution
 from users.authentication import jwt_auth
 from .helpers import submit_and_test_code
 from .schemas import CodeSubmissionSchema, CodeSubmissionResultSchema
@@ -36,14 +36,7 @@ def submit_code(request, payload: CodeSubmissionSchema):
         percentage_passed = int((passed_count / total_count) * 100) if total_count else 0
 
         user = request.auth
-        solution = Solution.objects.create(
-            problem=problem,
-            user=user,
-            code=payload.source_code,
-            language_id=payload.language_id,
-            percentage_passed=percentage_passed
-        )
-        solution.save()
+        create_solution(user, problem, payload.source_code, payload.language_id, percentage_passed)
 
         return 200, {"results": results}
 
