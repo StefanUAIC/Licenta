@@ -4,7 +4,7 @@ from django.db import transaction
 from ninja import Router
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .schemas import UserSchema, TokenSchema, ErrorResponseSchema, ErrorDetailSchema, LoginSchema
+from .schemas import UserSchema, TokenSchema, ErrorResponseSchema, ErrorDetailSchema, LoginSchema, ProfileSchema
 
 User = get_user_model()
 
@@ -73,11 +73,11 @@ def login(request, user_in: LoginSchema):
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
-@user_router.get('/{user_id}', response={200: UserSchema, 401: ErrorResponseSchema})
+@user_router.get('/{user_id}', response={200: ProfileSchema, 401: ErrorResponseSchema})
 def profile(request, user_id: int):
     try:
         user = User.objects.get(id=user_id)
-        return 200, UserSchema(
+        return 200, ProfileSchema(
             username=user.username,
             role=user.role,
             email=user.email,

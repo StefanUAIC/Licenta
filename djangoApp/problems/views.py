@@ -48,8 +48,11 @@ def get_problem(request, problem_id: int):
 @problems_router.post('/{problem_id}/test_cases/', response={201: TestCaseSchema, 400: dict})
 def create_test_case(request, problem_id: int, payload: CreateTestCaseSchema):
     problem = get_object_or_404(Problem, id=problem_id)
+    if problem.id != problem_id:
+        return 400, {"error": "Problem not found"}
+
     test_case = TestCase.objects.create(
-        problem=problem,
+        problem_id=problem_id,
         stdin=payload.stdin,
         expected_output=payload.expected_output
     )

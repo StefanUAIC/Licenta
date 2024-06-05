@@ -51,3 +51,11 @@ class ErrorDetailSchema(Schema):
 
 class ErrorResponseSchema(Schema):
     errors: list[ErrorDetailSchema]
+
+
+class ProfileSchema(Schema):
+    username: str
+    role: str
+    email: str
+    first_name: str
+    last_name: str

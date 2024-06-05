@@ -78,6 +78,5 @@ class TestCaseSchema(Schema):
 
 
 class CreateTestCaseSchema(Schema):
-    problem_id: int
     stdin: str
     expected_output: str
