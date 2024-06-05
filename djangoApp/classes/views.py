@@ -3,8 +3,8 @@ from typing import List
 
 from ninja import Router
 
-from code_submission.models import Solution
-from code_submission.schemas import SolutionSchema
+from solutions.models import Solution
+from solutions.schemas import SolutionSchema
 from problems.models import Problem
 from .models import Class, Membership, Homework
 from .schemas import ClassSchema, MembershipSchema, HomeworkSchema

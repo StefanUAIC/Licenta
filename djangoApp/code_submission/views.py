@@ -6,10 +6,10 @@ from dotenv import load_dotenv
 from ninja import Router
 
 from problems.models import Problem, TestCase
+from solutions.models import Solution
 from users.authentication import jwt_auth
 from .helpers import submit_and_test_code
-from .models import Solution
-from .schemas import SolutionSchema, CodeSubmissionSchema, CodeSubmissionResultSchema
+from .schemas import CodeSubmissionSchema, CodeSubmissionResultSchema
 
 code_submission_router = Router(tags=["Code Submission"])
 
