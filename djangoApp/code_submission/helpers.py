@@ -1,10 +1,16 @@
+import os
+
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+judge0_url = os.environ.get("JUDGE_URL").strip()
 
 
 def submit_and_test_code(source_code, language_id, test_cases):
     results = []
     passed_count = 0
-    judge0_url = "https://your-judge0-instance-url"
 
     for test_case in test_cases:
         api_url = f"{judge0_url}/submissions?base64_encoded=false"
@@ -25,6 +31,7 @@ def submit_and_test_code(source_code, language_id, test_cases):
         while status_id in [1, 2]:
             result_response = requests.get(result_url, headers=headers)
             result_data = result_response.json()
+            print("result_data1111", result_data)
             status_id = result_data.get("status", {}).get("id")
             if status_id in [1, 2]:
                 continue
@@ -38,7 +45,10 @@ def submit_and_test_code(source_code, language_id, test_cases):
             "expected_output": test_case.expected_output,
             "actual_output": result_data.get("stdout", ""),
             "status": result_data.get("status", {}).get("description", ""),
-            "passed": passed
+            "passed": passed,
+            "compile_output": result_data.get("compile_output", ""),
+            "stderr": result_data.get("stderr", ""),
+            "message": result_data.get("message", "")
         })
 
     return 200, {"results": results, "passed_count": passed_count, "total_count": len(test_cases)}

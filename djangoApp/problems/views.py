@@ -15,7 +15,6 @@ User = get_user_model()
 
 @problems_router.get('/', auth=jwt_auth, response=List[ProblemSchema])
 def list_problems(request):
-    print(f"User: {request.user}")
     if not request.user.is_authenticated:
         print("User is not authenticated")
     problems = Problem.objects.all()
