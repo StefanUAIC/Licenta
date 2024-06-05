@@ -73,10 +73,10 @@ def login(request, user_in: LoginSchema):
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
-@user_router.get('/profile', response={200: UserSchema, 401: ErrorResponseSchema})
-def profile(request):
+@user_router.get('/{user_id}', response={200: UserSchema, 401: ErrorResponseSchema})
+def profile(request, user_id: int):
     try:
-        user = request.user
+        user = User.objects.get(id=user_id)
         return 200, UserSchema(
             username=user.username,
             role=user.role,

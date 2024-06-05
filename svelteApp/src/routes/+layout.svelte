@@ -1,7 +1,8 @@
-<script>
+<script lang="ts">
 	import '../app.css';
 	import { AppShell } from '@skeletonlabs/skeleton';
 	import { onMount } from 'svelte';
+	import Footer from '../components/Footer.svelte';
 
 	let sidebarVisible = false;
 	let currentPage = '';
@@ -10,7 +11,7 @@
 		sidebarVisible = !sidebarVisible;
 	}
 
-	function updateCurrentPage(path) {
+	function updateCurrentPage(path: string) {
 		currentPage = path;
 	}
 
@@ -55,7 +56,7 @@
 
     .open #top {
         transform: translate(6px, 0px) rotate(45deg);
-		stroke: white;
+        stroke: white;
     }
 
     .open #middle {
@@ -64,14 +65,12 @@
 
     .open #bottom {
         transform: translate(-12px, 9px) rotate(-45deg);
-    		stroke: white;
-
-	}
+        stroke: white;
+    }
 
     .list-nav {
         padding-top: 60px; /* Adjust to create space for the logo */
     }
-
 
     .active-page::before {
         content: '';
@@ -88,26 +87,26 @@
     }
 
     .nav-link:hover {
-        background-color: white;
-        color: rgb(79 70 229) !important;
-
+        background-color: rgba(255, 255, 255, 0.3);
+        color: rgb(255, 255, 255) !important;
     }
 
-    .nav-link:focus {
-        background-color: white;
-        color: rgb(79 70 229);
+    .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
     }
 
-    .nav-link:active {
-        background-color: white;
-        color: rgb(79 70 229);
+    .main-content {
+        flex: 1;
     }
 
-    .nav-link:visited {
-        color: white;
-    }
-
-
+    /*.footer {*/
+    /*    background-color: #4f46e5;*/
+    /*    color: white;*/
+    /*    padding: 20px;*/
+    /*    text-align: center;*/
+    /*}*/
 </style>
 
 <AppShell slotSidebarLeft="w-56 p-4">
@@ -146,8 +145,25 @@
 					<i class="fas fa-code mr-2"></i> Compiler
 				</a>
 			</li>
+			<li class="relative mb-2">
+				<a href="/profile" on:click={() => updateCurrentPage('/profile')}
+				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
+					<i class="fas fa-user mr-2"></i> Profile
+				</a>
+			</li>
+			<li class="relative mb-2">
+				<a href="/problems" on:click={() => updateCurrentPage('/problems')}
+				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/problems' ? 'active-page' : ''}`}>
+					<i class="fas fa-tasks mr-2"></i> Problems
+				</a>
+			</li>
 		</ul>
 	</nav>
 
-	<slot></slot>
+	<div class="content-wrapper">
+		<main class="main-content">
+			<slot />
+		</main>
+		<Footer />
+	</div>
 </AppShell>
