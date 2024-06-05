@@ -47,7 +47,7 @@ int main()
 				stdin: testCase.input
 			});
 
-			const response = await fetch(`${API_URL}/code_submission/submit/`, {
+			const response = await fetch(`${API_URL}/code_submission/submit_code`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
