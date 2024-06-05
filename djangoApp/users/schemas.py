@@ -37,13 +37,17 @@ class LoginSchema(Schema):
 
 
 class TokenSchema(Schema):
-    token: str
+    access: str
+    refresh: str
     user_id: int
+    username: str
+    role: str
 
 
 class ErrorDetailSchema(Schema):
     field: str
     message: str
+
 
 class ErrorResponseSchema(Schema):
     errors: list[ErrorDetailSchema]

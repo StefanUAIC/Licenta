@@ -1,14 +1,22 @@
-from ninja import Router
-from rest_framework.authtoken.models import Token
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
+from ninja import Router
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .schemas import UserSchema, TokenSchema, ErrorResponseSchema, ErrorDetailSchema, LoginSchema
 
 User = get_user_model()
 
 user_router = Router(tags=["Users"])
+
+
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
 
 
 @user_router.post('/register', response={200: TokenSchema, 409: ErrorResponseSchema, 500: ErrorResponseSchema})
@@ -34,15 +42,13 @@ def register(request, user_in: UserSchema):
                 last_name=user_in.last_name
             )
             user.save()
-            token, _ = Token.objects.get_or_create(user=user)
+            tokens = get_tokens_for_user(user)
             return 200, TokenSchema(
-                token=token.key,
+                access=tokens['access'],
+                refresh=tokens['refresh'],
                 user_id=user.id,
                 username=user.username,
                 role=user.role,
-                email=user.email,
-                first_name=user.first_name,
-                last_name=user.last_name
             )
     except Exception as e:
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
@@ -55,27 +61,16 @@ def login(request, user_in: LoginSchema):
         if not user:
             return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message="Invalid credentials")]}
 
-        token, _ = Token.objects.get_or_create(user=user)
+        tokens = get_tokens_for_user(user)
         return 200, TokenSchema(
-            token=token.key,
+            access=tokens['access'],
+            refresh=tokens['refresh'],
             user_id=user.id,
             username=user.username,
             role=user.role,
-            email=user.email,
-            first_name=user.first_name,
-            last_name=user.last_name
         )
     except Exception as e:
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
-
-
-@user_router.get('/logout', response={200: dict, 401: ErrorResponseSchema})
-def logout(request):
-    try:
-        request.User.auth_token.delete()
-        return 200, {}
-    except Exception as e:
-        return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
 @user_router.get('/profile', response={200: UserSchema, 401: ErrorResponseSchema})
@@ -84,7 +79,7 @@ def profile(request):
         user = request.user
         return 200, UserSchema(
             username=user.username,
-            role=User.role,
+            role=user.role,
             email=user.email,
             first_name=user.first_name,
             last_name=user.last_name

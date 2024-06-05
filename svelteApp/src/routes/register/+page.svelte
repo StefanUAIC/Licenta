@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { register } from '$lib/api';
+	import { register } from '$lib/auth_api';
 	import EyeIcon from '../../components/EyeIcon.svelte';
 	import ClosedEyeIcon from '../../components/ClosedEyeIcon.svelte';
 
@@ -72,7 +72,6 @@
 	const handleRegister = async () => {
 		errors = [];
 
-		// Client-side validation
 		let validationError = validateUsername(username);
 		if (validationError) {
 			errors = [...errors, validationError];

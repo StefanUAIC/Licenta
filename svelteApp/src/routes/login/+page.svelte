@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { login } from '$lib/api';
+	import { login } from '$lib/auth_api';
 	import EyeIcon from '../../components/EyeIcon.svelte';
 	import ClosedEyeIcon from '../../components/ClosedEyeIcon.svelte';
 
@@ -12,9 +12,12 @@
 	const handleLogin = async () => {
 		try {
 			const response = await login(username, password);
-			console.log('Logged in:', response);
-			// Clear the error if login is successful
+			console.log('Response:', response);
+			document.cookie = `access=${response.access}; path=/; SameSite=Strict`;
+			document.cookie = `refresh=${response.refresh}; path=/; SameSite=Strict`;
+
 			errors = '';
+			// await goto('/')
 		} catch (err) {
 			console.log('Error:', err);
 			if (Array.isArray(err)) {

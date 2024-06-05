@@ -10,15 +10,44 @@ class Problem(models.Model):
         ('medium', 'Medium'),
         ('hard', 'Hard'),
     )
+    CATEGORIES = (
+        ('arrays', 'Arrays'),
+        ('linked_lists', 'Linked Lists'),
+        ('sorting', 'Sorting'),
+        ('searching', 'Searching'),
+        ('trees', 'Trees'),
+        ('graphs', 'Graphs'),
+        ('dynamic_programming', 'Dynamic Programming'),
+        ('recursion', 'Recursion'),
+        ('backtracking', 'Backtracking'),
+        ('bit_manipulation', 'Bit Manipulation'),
+        ('greedy', 'Greedy'),
+        ('math', 'Math'),
+        ('geometry', 'Geometry'),
+        ('combinatorics', 'Combinatorics'),
+        ('probability', 'Probability'),
+        ('game_theory', 'Game Theory'),
+        ('puzzles', 'Puzzles'),
+        ('miscellaneous', 'Miscellaneous'),
+    )
+    GRADES = (
+        (9, '9th'),
+        (10, '10th'),
+        (11, '11th'),
+        (12, '12th'),
+    )
+
     title = models.CharField(max_length=255)
     description = models.TextField()
-    difficulty = models.CharField(max_length=10, choices=DIFFICULTIES)
+    difficulty = models.CharField(choices=DIFFICULTIES, default='easy')
     example_input = models.TextField()
     example_output = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='problems')
     solution_code = models.TextField()
+    grade = models.IntegerField(choices=GRADES, default=9)
+    category = models.CharField(choices=CATEGORIES, default='miscellaneous')
 
     def __str__(self):
         return self.title

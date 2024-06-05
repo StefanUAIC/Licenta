@@ -15,7 +15,7 @@ load_dotenv()
 judge0_url = os.environ.get("JUDGE_URL").strip()
 
 
-@code_submission_router.post("/submit_code/", response={200: SolutionSchema, 400: dict, 404: dict})
+@code_submission_router.post("/submit_code", response={200: SolutionSchema, 400: dict, 404: dict})
 def submit_code(request, payload: CodeSubmissionSchema):
     api_url = f"{judge0_url}/submissions?base64_encoded=false"
     headers = {"Content-Type": "application/json"}
@@ -36,7 +36,7 @@ def submit_code(request, payload: CodeSubmissionSchema):
     while result_response.json().get("status").get("id") in [1, 2]:
         result_response = requests.get(result_url, headers=headers)
 
-    return result_response.json()
+    return SolutionSchema()
 
 
 # @code_submission_router.post('/submit_solution/', response={200: SolutionSchema, 400: dict, 404: dict})
@@ -80,7 +80,14 @@ def submit_code(request, payload: CodeSubmissionSchema):
 #     return 200, SolutionSchema.from_orm(solution)
 
 
-@code_submission_router.get('/{problem_id}/solutions/', response=List[SolutionSchema])
+@code_submission_router.get('/{problem_id}/solutions', response=List[SolutionSchema])
 def list_solutions(request, problem_id: int):
     solutions = Solution.objects.filter(problem_id=problem_id)
     return [SolutionSchema.from_orm(solution) for solution in solutions]
+
+
+@code_submission_router.get('/languages', response=List[dict])
+def list_languages(request):
+    api_url = f"{judge0_url}/languages"
+    response = requests.get(api_url)
+    return response.json()
