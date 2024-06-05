@@ -45,7 +45,7 @@ def get_problem(request, problem_id: int):
     return 200, ProblemSchema.from_orm(problem)
 
 
-@problems_router.post('/{problem_id}/test_cases/', response={201: TestCaseSchema, 400: dict})
+@problems_router.post('/{problem_id}/test_cases/', auth=jwt_auth, response={201: TestCaseSchema, 400: dict})
 def create_test_case(request, problem_id: int, payload: CreateTestCaseSchema):
     problem = get_object_or_404(Problem, id=problem_id)
     if problem.id != problem_id:

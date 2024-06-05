@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import (
 from classes.views import classes_router
 from code_submission.views import code_submission_router
 from problems.views import problems_router
+from solutions.views import solutions_router
 from users.views import user_router
 
 api = NinjaAPI()
@@ -17,6 +18,7 @@ api.add_router("/users/", user_router)
 api.add_router("/problems/", problems_router)
 api.add_router("/code_submission/", code_submission_router)
 api.add_router("/classes/", classes_router)
+api.add_router("/solutions", solutions_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

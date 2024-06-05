@@ -53,6 +53,7 @@ INSTALLED_APPS += [
     'users',
     'classes',
     'problems',
+    'solutions',
     'code_submission'
 ]
 
