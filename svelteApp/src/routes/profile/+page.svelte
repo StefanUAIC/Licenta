@@ -1,26 +1,52 @@
 <script lang="ts">
     import {type PaginationSettings, Paginator} from '@skeletonlabs/skeleton';
-    import {writable} from 'svelte/store';
+    import {type Writable, writable} from 'svelte/store';
     import {faker} from '@faker-js/faker';
+    import {onMount} from 'svelte';
+    import {getProfile} from '$lib/profile_api';
+    import type {ProfileSchema} from "$lib/profile_api";
 
-    interface User {
-        firstname: string;
-        lastname: string;
-        email: string;
-        role: string;
+    import {getUserIDFromJWT} from '$lib/profile_api';
+    import {accessToken} from '$lib/stores';
+
+    let user_id: number;
+    console.log(accessToken);
+    $: {
+        user_id = getUserIDFromJWT($accessToken);
+        console.log('USER ID', user_id);
+    }
+
+
+    // Define ProfileSchema to include rank and level
+    interface ExtendedProfileSchema extends ProfileSchema {
         rank: string;
         level: number;
         profilePicture: string;
     }
 
-    const user = writable<User>({
-        firstname: 'John',
-        lastname: 'Doe',
-        email: 'john.doe@example.com',
-        role: 'Student',
-        rank: 'Gold',
-        level: 42,
-        profilePicture: 'default-profile-picture.png'
+    const user: Writable<ExtendedProfileSchema[]> = writable([]);
+    const error: Writable<string | null> = writable(null);
+
+
+    const fetchProfile = async () => {
+        try {
+            const data = await getProfile(getUserIDFromJWT($accessToken));
+            const extendedData = {
+                ...data,
+                rank: 'Gold', // Hardcoded rank
+                level: 42, // Hardcoded level
+                profilePicture: 'default-profile-picture.png'
+            };
+            user.set([extendedData]);
+
+        } catch (err) {
+            console.error('Failed to load profile:', err);
+            error.set('Failed to load profile');
+        }
+    };
+
+    onMount(() => {
+        fetchProfile();
     });
 
     let showEditProfileModal = writable(false);
@@ -143,22 +169,21 @@
 </script>
 
 <div class="container mx-auto my-24">
-    <div class="bg-white rounded-lg shadow-lg flex p-6 h-60"> <!-- Increase the height -->
-        <img src={$user.profilePicture} alt="User profile picture" class="h-full w-auto object-cover mr-6">
-        <!-- Image same height as container -->
-        <div class="flex-1 flex flex-col justify-center text-2xl"> <!-- Increase text size and center content -->
-            <h2 class="text-4xl font-bold">{$user.firstname} {$user.lastname}</h2> <!-- Larger font size for name -->
-            <p class="text-xl">{$user.email}</p> <!-- Increase font size for details -->
-            <p class="text-xl">Rank: {$user.rank}</p>
-            <p class="text-xl">Level: {$user.level}</p>
-            <p class="text-xl">Role: {$user.role}</p>
-            <div class="flex justify-end mt-4 space-x-2"> <!-- Right align buttons and add space between them -->
+    <div class="bg-white rounded-lg shadow-lg flex p-6 h-60">
+        <img src={$user[0].profilePicture} alt="User profile picture" class="h-full w-auto object-cover mr-6">
+        <div class="flex-1 flex flex-col justify-center text-2xl">
+            <h2 class="text-4xl font-bold">{$user[0].first_name} {$user[0].last_name}</h2>
+            <p class="text-xl">{$user[0].email}</p>
+            <p class="text-xl">Rank: {$user[0].rank}</p>
+            <p class="text-xl">Level: {$user[0].level}</p>
+            <p class="text-xl">Role: {$user[0].role}</p>
+            <div class="flex justify-end mt-4 space-x-2">
                 <button class="btn flex items-center space-x-1 bg-indigo-custom" on:click={editProfile}>
-                    <i class="fas fa-edit w-5 h-5"></i> <!-- Font Awesome Icon -->
+                    <i class="fas fa-edit w-5 h-5"></i>
                     <span>Edit Profile</span>
                 </button>
                 <button class="btn flex items-center space-x-1 bg-teal-custom" on:click={changePassword}>
-                    <i class="fas fa-key w-5 h-5"></i> <!-- Font Awesome Icon -->
+                    <i class="fas fa-key w-5 h-5"></i>
                     <span>Change Password</span>
                 </button>
             </div>
@@ -172,22 +197,19 @@
                 <form class="z-50">
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="firstname">First Name</label>
-                        <input
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="firstname" type="text" placeholder="First Name">
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               id="firstname" type="text" placeholder="First Name">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="lastname">Last Name</label>
-                        <input
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="lastname" type="text" placeholder="Last Name">
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               id="lastname" type="text" placeholder="Last Name">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="profilePicture">Profile
                             Picture</label>
-                        <input
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="profilePicture" type="file">
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               id="profilePicture" type="file">
                     </div>
                     <div class="flex items-center justify-between">
                         <button class="btn bg-indigo-custom" type="button" on:click={closeModals}>Save</button>
@@ -200,7 +222,6 @@
         </div>
     {/if}
 
-
     {#if $showChangePasswordModal}
         <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center modal">
             <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
@@ -208,19 +229,16 @@
                 <form>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="oldPassword">Old Password</label>
-                        <input
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="oldPassword" type="password" placeholder="Old Password">
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               id="oldPassword" type="password" placeholder="Old Password">
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 text-sm font-bold mb-2" for="newPassword">New Password</label>
-                        <input
-                                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="newPassword" type="password" placeholder="New Password">
+                        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                               id="newPassword" type="password" placeholder="New Password">
                     </div>
                     <div class="flex items-center justify-between">
-                        <button class="btn bg-indigo-custom" type="button" on:click={closeModals}>Save
-                        </button>
+                        <button class="btn bg-indigo-custom" type="button" on:click={closeModals}>Save</button>
                         <button class="btn bg-gray-600 hover:bg-gray-700 rounded-md text-white" type="button"
                                 on:click={closeModals}>Cancel
                         </button>
@@ -232,20 +250,19 @@
 
     <div class="nav-container mt-8 pt-8">
         <div class="flex space-x-4 mb-4">
-            <button class="cursor-pointer text-lg" class:active={ $activeTab === 'sentSolutions' }
+            <button class="cursor-pointer text-lg" class:active={$activeTab === 'sentSolutions'}
                     on:click={() => activeTab.set('sentSolutions')}>Sent Solutions
             </button>
-            <button class="cursor-pointer text-lg" class:active={ $activeTab === 'problemsProposed' }
+            <button class="cursor-pointer text-lg" class:active={$activeTab === 'problemsProposed'}
                     on:click={() => activeTab.set('problemsProposed')}>Problems Proposed
             </button>
-            <button class="cursor-pointer text-lg" class:active={ $activeTab === 'myClasses' }
+            <button class="cursor-pointer text-lg" class:active={$activeTab === 'myClasses'}
                     on:click={() => activeTab.set('myClasses')}>My Classes
             </button>
         </div>
     </div>
 
     {#if $activeTab === 'sentSolutions'}
-        <!--			<h3 class="text-2xl font-bold">Sent Solutions</h3>-->
         <div class="w-full space-y-4 text-token mt-4">
             <table class="min-w-full divide-y divide-gray-200 shadow-lg">
                 <thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
@@ -261,8 +278,7 @@
                         {#each row as cell, index}
                             <td class="px-6 py-4 whitespace-nowrap {index === 0 ? 'rounded-l-md' : ''} {index === row.length - 1 ? 'rounded-r-md' : ''}">
                                 {#if index === 1}
-                                    <a href="/problem/{cell}"
-                                       class="text-indigo-600 hover:text-indigo-900">{cell}</a>
+                                    <a href="/problem/{cell}" class="text-indigo-600 hover:text-indigo-900">{cell}</a>
                                 {:else if index === 2}
                                     <span class={getDifficultyColor(cell)}>{cell}</span>
                                 {:else if index === 4}
@@ -279,18 +295,12 @@
                 {/each}
                 </tbody>
             </table>
-            <Paginator
-                    bind:settings={paginationSettings}
-                    on:page={onPageChange}
-                    on:amount={onAmountChange}
-                    showFirstLastButtons={state.firstLast}
-                    showPreviousNextButtons={state.previousNext}
-                    controlVariant="variant-soft bg-white"
-                    select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500  focus:border-indigo-500"
-            />
+            <Paginator bind:settings={paginationSettings} on:page={onPageChange} on:amount={onAmountChange}
+                       showFirstLastButtons={state.firstLast} showPreviousNextButtons={state.previousNext}
+                       controlVariant="variant-soft bg-white"
+                       select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500  focus:border-indigo-500"/>
         </div>
     {:else if $activeTab === 'problemsProposed'}
-        <!--			<h3 class="text-2xl font-bold">Problems Proposed</h3>-->
         <div class="w-full space-y-4 text-token mt-4">
             <table class="min-w-full divide-y divide-gray-200 shadow-lg">
                 <thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
@@ -306,8 +316,7 @@
                         {#each row as cell, index}
                             <td class="px-6 py-4 whitespace-nowrap {index === 0 ? 'rounded-l-md' : ''} {index === row.length - 1 ? 'rounded-r-md' : ''}">
                                 {#if index === 1}
-                                    <a href="/problem/{cell}"
-                                       class="text-indigo-600 hover:text-indigo-900">{cell}</a>
+                                    <a href="/problem/{cell}" class="text-indigo-600 hover:text-indigo-900">{cell}</a>
                                 {:else if index === 2}
                                     <span class={getDifficultyColor(cell)}>{cell}</span>
                                 {:else if index === 4}
@@ -321,18 +330,12 @@
                 {/each}
                 </tbody>
             </table>
-            <Paginator
-                    bind:settings={problemsPaginationSettings}
-                    on:page={onPageChange}
-                    on:amount={onAmountChange}
-                    showFirstLastButtons={state.firstLast}
-                    showPreviousNextButtons={state.previousNext}
-                    controlVariant="variant-soft bg-white"
-                    select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500  focus:border-indigo-500"
-            />
+            <Paginator bind:settings={problemsPaginationSettings} on:page={onPageChange} on:amount={onAmountChange}
+                       showFirstLastButtons={state.firstLast} showPreviousNextButtons={state.previousNext}
+                       controlVariant="variant-soft bg-white"
+                       select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500  focus:border-indigo-500"/>
         </div>
     {:else if $activeTab === 'myClasses'}
-        <!--			<h3 class="text-2xl font-bold">My Classes</h3>-->
         <div class="w-full space-y-4 text-token mt-4">
             <table class="min-w-full divide-y divide-gray-200 shadow-lg">
                 <thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
@@ -358,21 +361,15 @@
                 {/each}
                 </tbody>
             </table>
-            <Paginator
-                    bind:settings={classesPaginationSettings}
-                    on:page={onPageChange}
-                    on:amount={onAmountChange}
-                    showFirstLastButtons={state.firstLast}
-                    showPreviousNextButtons={state.previousNext}
-                    controlVariant="variant-soft bg-white"
-                    select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500  focus:border-indigo-500"
-            />
+            <Paginator bind:settings={classesPaginationSettings} on:page={onPageChange} on:amount={onAmountChange}
+                       showFirstLastButtons={state.firstLast} showPreviousNextButtons={state.previousNext}
+                       controlVariant="variant-soft bg-white"
+                       select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500  focus:border-indigo-500"/>
         </div>
     {/if}
 </div>
 
 <style lang="postcss">
-
     table thead th {
         padding: 1.5rem;
     }
@@ -393,7 +390,6 @@
         border-bottom-right-radius: 0.375rem; /* Rounded bottom-right corner of the first row */
     }
 
-
     .btn.bg-indigo-custom {
         @apply bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded;
     }
@@ -403,13 +399,12 @@
     }
 
     .btn.bg-solution-btn {
-        @apply bg-none  border-x-2 border-y-2 text-black hover:bg-indigo-600 hover:text-white hover:border-transparent py-2 px-4 rounded-md;
+        @apply bg-none border-x-2 border-y-2 text-black hover:bg-indigo-600 hover:text-white hover:border-transparent py-2 px-4 rounded-md;
     }
 
     .nav-container {
         position: relative;
         z-index: 1; /* Ensure this is on top */
-
     }
 
     .nav-container::after {
@@ -424,21 +419,16 @@
     }
 
     .cursor-pointer {
-
         cursor: pointer;
         padding: 0.5rem 1rem;
         position: relative;
         color: rgb(55, 65, 81, 0.5);
         z-index: 2; /* Ensure this is on top */
-
     }
 
     .cursor-pointer.active {
-        /*font-weight: bold;*/
-        /*font-size: 1.25rem; !* Increase text size when active *!*/
         color: rgb(55, 65, 81, 1);
         z-index: 1; /* Ensure the active line is above the main line */
-
     }
 
     .cursor-pointer.active::after {
@@ -449,12 +439,9 @@
         width: 100%;
         height: 4px; /* Thickness of the active underline */
         background-color: #5699dc; /* Indigo color for the active line */
-        /*z-index: -2;*/
     }
 
     .modal {
         z-index: 3;
     }
-
-
 </style>
