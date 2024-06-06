@@ -40,12 +40,11 @@
 			const createdProblem = await createProblem(problem);
 			const problemId = createdProblem.id;
 
-			const cases = $testCases;
-			for (const testCase of cases) {
+			for (const testCase of $testCases) {
 				await createTestCase(problemId, testCase);
 			}
 
-			goto(`/problems/${problemId}`);
+			await goto(`/problems/${problemId}`);
 		} catch (err) {
 			error.set('Failed to create problem or test cases');
 			console.error('Failed to create problem or test cases:', err);
@@ -61,10 +60,10 @@
 	}
 </script>
 
-<main class="min-h-screen bg-gray-100 py-10">
-	<div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
+<main class="min-h-screen bg-gray-100 py-10 flex justify-center items-center">
+	<div class="max-w-2xl w-full px-4">
 		<form on:submit|preventDefault={handleSubmit} class="space-y-4">
-			<h1 class="text-3xl font-bold mb-4">Create Problem</h1>
+			<h1 class="text-3xl font-bold mb-4 text-center">Create Problem</h1>
 
 			{#if $error}
 				<p class="text-red-500">{$error}</p>
@@ -142,11 +141,6 @@
 
 			<button type="submit" class="btn btn-primary">Create Problem</button>
 		</form>
-
-		<div>
-			<h2 class="text-2xl font-bold mb-4">Solution Code Editor</h2>
-			<CodeEditor bind:code={solution_code} />
-		</div>
 	</div>
 </main>
 
@@ -165,5 +159,17 @@
 
 	.error {
 		color: red;
+	}
+
+	main {
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+
+	@media (min-width: 1024px) {
+		main {
+			padding-left: 2rem;
+			padding-right: 2rem;
+		}
 	}
 </style>

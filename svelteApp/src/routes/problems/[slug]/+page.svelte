@@ -73,9 +73,13 @@
 
 <main class="min-h-screen bg-gray-100 py-10">
     <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {#if $error}
-            <p class="text-red-500 text-center mb-4">{$error}</p>
-        {/if}
+        <div class="col-span-1 lg:col-span-2">
+            <div class="h-8">
+                {#if $error}
+                    <p class="text-red-500 text-center">{$error}</p>
+                {/if}
+            </div>
+        </div>
 
         {#if $problem}
             <div class="bg-white p-6 rounded-lg shadow-md">
@@ -124,7 +128,7 @@
                         {#each $result as testCase, index}
                             <div class="p-4 bg-white border rounded-lg mb-4">
                                 <h3 class="text-xl font-semibold">Test Case {index + 1}</h3>
-                                <p><strong>Status:</strong> {testCase.status}</p>
+                                <p><strong>Status:</strong> {testCase.status || 'Rejected'}</p>
                                 <p><strong>Passed:</strong> {testCase.passed ? 'Yes' : 'No'}</p>
                             </div>
                         {/each}

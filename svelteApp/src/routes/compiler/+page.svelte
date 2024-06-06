@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
-	import { get } from 'svelte/store';
+	import { get, writable } from 'svelte/store';
 	import AceEditor from '../../components/CodeEditor.svelte';
+	import axios from 'axios';
+	import { getAuthHeaders } from '$lib/utils';
 
 	const API_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -41,28 +42,28 @@ int main()
 		let currentTestCases = get(testCases);
 
 		for (const testCase of currentTestCases) {
-			let body = JSON.stringify({
+			let body = {
 				source_code,
 				language_id,
 				stdin: testCase.input
-			});
+			};
 
-			const response = await fetch(`${API_URL}/code_submission/submit_code`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: body
-			});
+			try {
+				const response = await axios.post(`${API_URL}/code_submission/`, body, getAuthHeaders());
 
-			const data = await response.json();
-			console.log(data);
-			testCase.actualOutput = data.stdout;
-			testCase.status = data.status.description;
-			testCase.passed = (testCase.actualOutput?.trim() || '') === testCase.expectedOutput.trim();
+				const data = response.data;
+				console.log(data);
+				testCase.actualOutput = data.stdout;
+				testCase.status = data.status.description;
+				testCase.passed = (testCase.actualOutput?.trim() || '') === testCase.expectedOutput.trim();
 
-			if (testCase.passed) {
-				passed += 1;
+				if (testCase.passed) {
+					passed += 1;
+				}
+			} catch (error) {
+				console.error('Error submitting code:', error);
+				testCase.status = 'Error';
+				testCase.passed = false;
 			}
 		}
 
