@@ -3,7 +3,7 @@ from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from ninja import Router
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from .authentication import jwt_auth
 from .schemas import UserSchema, TokenSchema, ErrorResponseSchema, ErrorDetailSchema, LoginSchema, ProfileSchema
 
 User = get_user_model()
@@ -73,7 +73,7 @@ def login(request, user_in: LoginSchema):
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
-@user_router.get('/{user_id}', response={200: ProfileSchema, 401: ErrorResponseSchema})
+@user_router.get('/{user_id}', auth=jwt_auth, response={200: ProfileSchema, 401: ErrorResponseSchema})
 def profile(request, user_id: int):
     try:
         user = User.objects.get(id=user_id)
