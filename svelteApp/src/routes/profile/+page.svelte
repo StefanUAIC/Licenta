@@ -6,7 +6,6 @@
     import type {ProfileSchema} from "$lib/profile_api";
     import {getProfile} from '$lib/profile_api';
 
-    // Define ProfileSchema to include rank and level
     interface ExtendedProfileSchema extends ProfileSchema {
         rank: string;
         level: number;
@@ -61,7 +60,7 @@
         faker.hacker.phrase(),
         ['Easy', 'Medium', 'Hard'][Math.floor(Math.random() * 3)],
         faker.date.past().toLocaleDateString(),
-        Math.floor(Math.random() * 101),  // Random score between 0 and 100
+        Math.floor(Math.random() * 101),
         faker.string.uuid()
     ]);
 
@@ -372,19 +371,19 @@
     }
 
     table thead th:first-child {
-        border-top-left-radius: 0.375rem; /* Rounded top-left corner */
+        border-top-left-radius: 0.375rem;
     }
 
     table thead th:last-child {
-        border-top-right-radius: 0.375rem; /* Rounded top-right corner */
+        border-top-right-radius: 0.375rem;
     }
 
     table tbody tr:first-child td:first-child {
-        border-bottom-left-radius: 0.375rem; /* Rounded bottom-left corner of the first row */
+        border-bottom-left-radius: 0.375rem;
     }
 
     table tbody tr:first-child td:last-child {
-        border-bottom-right-radius: 0.375rem; /* Rounded bottom-right corner of the first row */
+        border-bottom-right-radius: 0.375rem;
     }
 
     .btn.bg-indigo-custom {
@@ -401,7 +400,7 @@
 
     .nav-container {
         position: relative;
-        z-index: 1; /* Ensure this is on top */
+        z-index: 1;
     }
 
     .nav-container::after {
@@ -411,8 +410,8 @@
         left: 0;
         width: 100%;
         height: 2px;
-        z-index: 0; /* Ensure the line is below the container */
-        background-color: rgb(55, 65, 81, 0.2); /* Light gray color for the line */
+        z-index: 0;
+        background-color: rgb(55, 65, 81, 0.2);
     }
 
     .cursor-pointer {
@@ -420,22 +419,22 @@
         padding: 0.5rem 1rem;
         position: relative;
         color: rgb(55, 65, 81, 0.5);
-        z-index: 2; /* Ensure this is on top */
+        z-index: 2;
     }
 
     .cursor-pointer.active {
         color: rgb(55, 65, 81, 1);
-        z-index: 1; /* Ensure the active line is above the main line */
+        z-index: 1;
     }
 
     .cursor-pointer.active::after {
         content: '';
         position: absolute;
-        bottom: 1px; /* Position the active line below the main line */
+        bottom: 1px;
         left: 0;
         width: 100%;
-        height: 4px; /* Thickness of the active underline */
-        background-color: #5699dc; /* Indigo color for the active line */
+        height: 4px;
+        background-color: #5699dc;
     }
 
     .modal {

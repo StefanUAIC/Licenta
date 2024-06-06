@@ -2,6 +2,7 @@
 	import { login } from '$lib/auth_api';
 	import EyeIcon from '../../components/EyeIcon.svelte';
 	import ClosedEyeIcon from '../../components/ClosedEyeIcon.svelte';
+	import { goto } from '$app/navigation';
 
 	let username = '';
 	let password = '';
@@ -17,7 +18,7 @@
 			document.cookie = `refresh=${response.refresh}; path=/; SameSite=Strict`;
 
 			errors = '';
-			// await goto('/')
+			await goto('/posts')
 		} catch (err) {
 			console.log('Error:', err);
 			if (Array.isArray(err)) {

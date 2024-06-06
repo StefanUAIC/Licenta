@@ -2,6 +2,7 @@
 	import { register } from '$lib/auth_api';
 	import EyeIcon from '../../components/EyeIcon.svelte';
 	import ClosedEyeIcon from '../../components/ClosedEyeIcon.svelte';
+	import { goto } from '$app/navigation';
 
 	let username = '';
 	let password = '';
@@ -109,7 +110,7 @@
 			const user = { username, password, role, email, first_name, last_name };
 			const response = await register(user);
 			console.log('Registered:', response);
-			// Redirect or perform any post-registration actions
+			await goto('/posts');
 		} catch (err) {
 			console.log('Registration error:', err);
 			if (Array.isArray(err)) {

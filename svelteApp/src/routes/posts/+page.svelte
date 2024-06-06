@@ -20,7 +20,7 @@
 	<div class="waves-container">
 		<Waves_2 />
 			<div class="container mx-auto pb-8">
-				<h2 class="text-3xl font-bold mb-12 text-white">Postări ale utilizatorilor</h2>
+				<h2 class="text-3xl font-bold mb-12 text-white">Users posts</h2>
 				<UserPosts />
 			</div>
 	</div>

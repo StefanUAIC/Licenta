@@ -69,7 +69,7 @@
     }
 
     .list-nav {
-        padding-top: 60px; /* Adjust to create space for the logo */
+        padding-top: 60px
     }
 
     .active-page::before {
@@ -79,7 +79,7 @@
         top: 0;
         bottom: 0;
         width: 4px;
-        background-color: white; /* Vertical line color */
+        background-color: white;
     }
 
     .nav-link {
@@ -123,15 +123,9 @@
 			class="list-nav fixed top-0 left-0 w-56 h-full bg-indigo-600 z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
 			<ul>
 				<li class="relative mb-2">
-					<a href="/compiler" on:click={() => updateCurrentPage('/compiler')}
-					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/compiler' ? 'active-page' : ''}`}>
-						<i class="fas fa-code mr-2"></i> Compiler
-					</a>
-				</li>
-				<li class="relative mb-2">
-					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
-					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
-						<i class="fas fa-user mr-2"></i> Profile
+					<a href="/posts" on:click={() => updateCurrentPage('/about')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/posts' ? 'active-page' : ''}`}>
+						<i class="fas fa-blog mr-2"></i> Posts
 					</a>
 				</li>
 				<li class="relative mb-2">
@@ -141,9 +135,15 @@
 					</a>
 				</li>
 				<li class="relative mb-2">
-					<a href="/posts" on:click={() => updateCurrentPage('/about')}
-					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/posts' ? 'active-page' : ''}`}>
-						<i class="fas fa-blog mr-2"></i> Posts
+					<a href="/compiler" on:click={() => updateCurrentPage('/compiler')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/compiler' ? 'active-page' : ''}`}>
+						<i class="fas fa-code mr-2"></i> Compiler
+					</a>
+				</li>
+				<li class="relative mb-2">
+					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
+						<i class="fas fa-user mr-2"></i> Profile
 					</a>
 				</li>
 			</ul>
