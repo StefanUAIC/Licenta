@@ -49,23 +49,14 @@ export const register = async (user: UserSchema): Promise<TokenSchema> => {
 };
 
 
-export function isAuthenticated(request: Request | null = null): boolean {
-	let cookies = '';
+export function isAuthenticated(accessToken: string | null): boolean {
+    if (!accessToken) return false;
 
-	if (request) {
-		// Server-side: read cookies from request headers
-		cookies = request.headers.get('cookie') || '';
-	}
-
-	// Use getCookie function with the correct cookies context
-	const accessToken = getCookie('access_token', cookies);
-	if (!accessToken) return false;
-
-	try {
-		const payload = JSON.parse(atob(accessToken.split('.')[1]));
-		const currentTime = Date.now() / 1000;
-		return payload.exp > currentTime;
-	} catch (e) {
-		return false;
-	}
+    try {
+        const payload = JSON.parse(atob(accessToken.split('.')[1]));
+        const currentTime = Date.now() / 1000;
+        return payload.exp > currentTime;
+    } catch (e) {
+        return false;
+    }
 }

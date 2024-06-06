@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { AppShell } from '@skeletonlabs/skeleton';
-	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import Footer from '../components/Footer.svelte';
 
 	let sidebarVisible = false;
@@ -11,13 +11,13 @@
 		sidebarVisible = !sidebarVisible;
 	}
 
+	$: {
+		currentPage = $page.url.pathname;
+	}
+
 	function updateCurrentPage(path: string) {
 		currentPage = path;
 	}
-
-	onMount(() => {
-		currentPage = window.location.pathname; // Get the current path
-	});
 </script>
 
 <style>
@@ -110,55 +110,45 @@
 </style>
 
 <AppShell slotSidebarLeft="w-56 p-4">
-	<button class="hamburger" class:open={sidebarVisible} on:click={toggleSidebar}>
-		<svg width="32" height="24">
-			<line id="top" x1="0" y1="2" x2="32" y2="2" />
-			<line id="middle" x1="0" y1="12" x2="24" y2="12" />
-			<line id="bottom" x1="0" y1="22" x2="32" y2="22" />
-		</svg>
-	</button>
+	{#if !['/', '/login', '/register'].includes(currentPage)}
+		<button class="hamburger" class:open={sidebarVisible} on:click={toggleSidebar}>
+			<svg width="32" height="24">
+				<line id="top" x1="0" y1="2" x2="32" y2="2" />
+				<line id="middle" x1="0" y1="12" x2="24" y2="12" />
+				<line id="bottom" x1="0" y1="22" x2="32" y2="22" />
+			</svg>
+		</button>
 
-	<nav
-		class="list-nav fixed top-0 left-0 w-56 h-full bg-indigo-600 z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
-		<ul>
-			<li class="relative mb-2">
-				<a href="/" on:click={() => updateCurrentPage('/')}
-				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/' ? 'active-page' : ''}`}>
-					<i class="fas fa-home mr-2"></i> Home
-				</a>
-			</li>
-			<li class="relative mb-2">
-				<a href="/login" on:click={() => updateCurrentPage('/login')}
-				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/login' ? 'active-page' : ''}`}>
-					<i class="fas fa-sign-in-alt mr-2"></i> Login
-				</a>
-			</li>
-			<li class="relative mb-2">
-				<a href="/register" on:click={() => updateCurrentPage('/register')}
-				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/register' ? 'active-page' : ''}`}>
-					<i class="fas fa-user-plus mr-2"></i> Register
-				</a>
-			</li>
-			<li class="relative mb-2">
-				<a href="/compiler" on:click={() => updateCurrentPage('/compiler')}
-				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/compiler' ? 'active-page' : ''}`}>
-					<i class="fas fa-code mr-2"></i> Compiler
-				</a>
-			</li>
-			<li class="relative mb-2">
-				<a href="/profile" on:click={() => updateCurrentPage('/profile')}
-				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
-					<i class="fas fa-user mr-2"></i> Profile
-				</a>
-			</li>
-			<li class="relative mb-2">
-				<a href="/problems" on:click={() => updateCurrentPage('/problems')}
-				   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/problems' ? 'active-page' : ''}`}>
-					<i class="fas fa-tasks mr-2"></i> Problems
-				</a>
-			</li>
-		</ul>
-	</nav>
+		<nav
+			class="list-nav fixed top-0 left-0 w-56 h-full bg-indigo-600 z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
+			<ul>
+				<li class="relative mb-2">
+					<a href="/compiler" on:click={() => updateCurrentPage('/compiler')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/compiler' ? 'active-page' : ''}`}>
+						<i class="fas fa-code mr-2"></i> Compiler
+					</a>
+				</li>
+				<li class="relative mb-2">
+					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
+						<i class="fas fa-user mr-2"></i> Profile
+					</a>
+				</li>
+				<li class="relative mb-2">
+					<a href="/problems" on:click={() => updateCurrentPage('/problems')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/problems' ? 'active-page' : ''}`}>
+						<i class="fas fa-tasks mr-2"></i> Problems
+					</a>
+				</li>
+				<li class="relative mb-2">
+					<a href="/posts" on:click={() => updateCurrentPage('/about')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/posts' ? 'active-page' : ''}`}>
+						<i class="fas fa-blog mr-2"></i> Posts
+					</a>
+				</li>
+			</ul>
+		</nav>
+	{/if}
 
 	<div class="content-wrapper">
 		<main class="main-content">
