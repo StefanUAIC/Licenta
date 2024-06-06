@@ -30,7 +30,6 @@ export interface TestCase {
 export const getAllProblems = async (): Promise<ProblemSchema[]> => {
 	try {
 		const response = await axios.get<ProblemSchema[]>(API_PROBLEMS_URL, getAuthHeaders());
-		console.log('response.data', response.data);
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
@@ -58,7 +57,21 @@ export const getProblemById = async (problemId: number): Promise<ProblemSchema> 
 
 export const createProblem = async (problem: ProblemSchema): Promise<ProblemSchema> => {
 	try {
-		const response = await axios.post<ProblemSchema>(`${API_PROBLEMS_URL}`, problem, getAuthHeaders());
+		const response = await axios.post<ProblemSchema>(`${API_PROBLEMS_URL}/`, problem, getAuthHeaders());
+		return response.data;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			console.log(error.response.data.errors);
+			throw error.response.data.errors;
+		} else {
+			throw new Error('An unexpected error occurred');
+		}
+	}
+};
+
+export const createTestCase = async (problemId: number, testCase: { stdin: string; expected_output: string }): Promise<TestCase> => {
+	try {
+		const response = await axios.post<TestCase>(`${API_PROBLEMS_URL}/${problemId}/test_cases/`, testCase, getAuthHeaders());
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
@@ -71,15 +84,15 @@ export const createProblem = async (problem: ProblemSchema): Promise<ProblemSche
 };
 
 export const getTestCasesByProblemId = async (problemId: number): Promise<TestCase[]> => {
-    try {
-        const response = await axios.get<TestCase[]>(`${API_PROBLEMS_URL}/${problemId}/test_cases`, getAuthHeaders());
-        return response.data;
-    } catch (error) {
-        if (axios.isAxiosError(error) && error.response) {
-            console.log(error.response.data.errors);
-            throw error.response.data.errors;
-        } else {
-            throw new Error('An unexpected error occurred');
-        }
-    }
+	try {
+		const response = await axios.get<TestCase[]>(`${API_PROBLEMS_URL}/${problemId}/test_cases`, getAuthHeaders());
+		return response.data;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			console.log(error.response.data.errors);
+			throw error.response.data.errors;
+		} else {
+			throw new Error('An unexpected error occurred');
+		}
+	}
 };

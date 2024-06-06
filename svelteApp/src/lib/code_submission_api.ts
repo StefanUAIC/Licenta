@@ -30,8 +30,22 @@ export const submitCode = async (submission: CodeSubmissionSchema): Promise<Code
 			submission,
 			getAuthHeaders()
 		);
-		console.log('response.data', response.data.results)
+		console.log('response.data', response.data.results);
 		return response.data.results;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			console.error(error.response.data);
+			throw error.response.data;
+		} else {
+			throw new Error('An unexpected error occurred');
+		}
+	}
+};
+
+export const fetchLanguages = async (): Promise<{ id: number; name: string }[]> => {
+	try {
+		const response = await axios.get(`${API_CODE_SUBMISSION_URL}/languages`, getAuthHeaders());
+		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
 			console.error(error.response.data);

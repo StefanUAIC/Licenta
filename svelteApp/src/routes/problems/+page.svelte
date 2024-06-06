@@ -3,6 +3,7 @@
 	import { derived, writable, type Writable } from 'svelte/store';
 	import type { ProblemSchema } from '$lib/problems_api';
 	import { getAllProblems } from '$lib/problems_api';
+	import { goto } from '$app/navigation';
 
 	const search: Writable<string> = writable('');
 	const difficulty: Writable<string> = writable('');
@@ -74,6 +75,10 @@
 			});
 		}
 	);
+
+	function handleCreateProblem() {
+		goto('/problems/create');
+	}
 </script>
 
 <main class="min-h-screen bg-gray-100 py-10">
@@ -103,26 +108,15 @@
 			<select bind:value={$category}
 					class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
 				<option value="">All Categories</option>
-				<option value="arrays">Arrays</option>
-				<option value="linked_lists">Linked Lists</option>
-				<option value="sorting">Sorting</option>
-				<option value="searching">Searching</option>
-				<option value="trees">Trees</option>
-				<option value="graphs">Graphs</option>
-				<option value="dynamic_programming">Dynamic Programming</option>
-				<option value="recursion">Recursion</option>
-				<option value="backtracking">Backtracking</option>
-				<option value="bit_manipulation">Bit Manipulation</option>
-				<option value="greedy">Greedy</option>
-				<option value="math">Math</option>
-				<option value="geometry">Geometry</option>
-				<option value="combinatorics">Combinatorics</option>
-				<option value="probability">Probability</option>
-				<option value="game_theory">Game Theory</option>
-				<option value="puzzles">Puzzles</option>
-				<option value="miscellaneous">Miscellaneous</option>
+				{#each Object.entries(categoryLabels) as [key, value]}
+					<option value={key}>{value}</option>
+				{/each}
 			</select>
 		</form>
+
+		<div class="text-right mb-6">
+			<button on:click={handleCreateProblem} class="btn btn-primary">Create Problem</button>
+		</div>
 
 		<ul class="space-y-4">
 			{#each $filteredProblems as problem}
@@ -141,7 +135,15 @@
 </main>
 
 <style>
-    .error {
-        color: red;
-    }
+	.btn {
+		@apply px-4 py-2 rounded-lg;
+	}
+
+	.btn-primary {
+		@apply bg-blue-500 text-white;
+	}
+
+	.error {
+		color: red;
+	}
 </style>
