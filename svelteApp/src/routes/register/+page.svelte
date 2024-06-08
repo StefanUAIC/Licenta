@@ -109,7 +109,12 @@
 		try {
 			const user = { username, password, role, email, first_name, last_name };
 			const response = await register(user);
+
+			document.cookie = `access=${response.access}; path=/; SameSite=Strict`;
+			document.cookie = `refresh=${response.refresh}; path=/; SameSite=Strict`;
+
 			console.log('Registered:', response);
+
 			await goto('/posts');
 		} catch (err) {
 			console.log('Registration error:', err);
