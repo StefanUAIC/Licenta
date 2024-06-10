@@ -1,6 +1,5 @@
 export function getCookie(name: string, cookies: string = ''): string | null {
 	if (!cookies && typeof document !== 'undefined') {
-		console.log('document.cookie', document.cookie);
 		cookies = document.cookie;
 	}
 

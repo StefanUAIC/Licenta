@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { getCookie } from '$lib/utils';
 
 const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
 
