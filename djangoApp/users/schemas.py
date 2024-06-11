@@ -59,3 +59,11 @@ class ProfileSchema(Schema):
     email: str
     first_name: str
     last_name: str
+
+
+class TokenRefreshSchema(Schema):
+    access: str
+
+
+class RefreshTokenSchema(Schema):
+    refresh: str
