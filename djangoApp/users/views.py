@@ -2,9 +2,13 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
 from ninja import Router
+from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from .authentication import jwt_auth
-from .schemas import UserSchema, TokenSchema, ErrorResponseSchema, ErrorDetailSchema, LoginSchema, ProfileSchema
+from .schemas import ErrorResponseSchema, ErrorDetailSchema
+from .schemas import TokenRefreshSchema, RefreshTokenSchema
+from .schemas import UserSchema, TokenSchema, LoginSchema, ProfileSchema
 
 User = get_user_model()
 
@@ -71,6 +75,25 @@ def login(request, user_in: LoginSchema):
         )
     except Exception as e:
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
+
+
+@user_router.post('/refresh', response={200: TokenRefreshSchema, 401: ErrorResponseSchema})
+def refresh(request, refresh_token: RefreshTokenSchema):
+    try:
+        print("refresh_token:", refresh_token)
+        refresh = RefreshToken(refresh_token.refresh)
+        user_id = refresh['user_id']
+        user = User.objects.get(id=user_id)
+
+        tokens = get_tokens_for_user(user)
+
+        return 200, TokenRefreshSchema(
+            access=tokens['access'],
+        )
+    except InvalidToken as e:
+        return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
+    except Exception as e:
+        return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
 @user_router.get('/{user_id}', auth=jwt_auth, response={200: ProfileSchema, 401: ErrorResponseSchema})

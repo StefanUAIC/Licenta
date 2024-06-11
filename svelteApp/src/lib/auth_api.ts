@@ -19,6 +19,10 @@ interface TokenSchema {
 	role: string;
 }
 
+interface AccessTokenSchema {
+	access: string;
+}
+
 export const login = async (username: string, password: string): Promise<TokenSchema> => {
 	try {
 		const response = await axios.post<TokenSchema>(`${API_AUTH_URL}/login`, { username, password });
@@ -49,13 +53,27 @@ export const register = async (user: UserSchema): Promise<TokenSchema> => {
 
 
 export function isAuthenticated(accessToken: string | null): boolean {
-    if (!accessToken) return false;
+	if (!accessToken) return false;
 
-    try {
-        const payload = JSON.parse(atob(accessToken.split('.')[1]));
-        const currentTime = Date.now() / 1000;
-        return payload.exp > currentTime;
-    } catch (e) {
-        return false;
-    }
+	try {
+		const payload = JSON.parse(atob(accessToken.split('.')[1]));
+		const currentTime = Date.now() / 1000;
+		return payload.exp > currentTime;
+	} catch (e) {
+		return false;
+	}
 }
+
+export const refreshAccessToken = async (refreshToken: string): Promise<AccessTokenSchema> => {
+	try {
+		const response = await axios.post<AccessTokenSchema>(`${API_AUTH_URL}/refresh`, { refresh: refreshToken });
+		return response.data;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			console.log(error.response.data.errors);
+			throw error.response.data.errors;
+		} else {
+			throw new Error('An unexpected error occurred');
+		}
+	}
+};
