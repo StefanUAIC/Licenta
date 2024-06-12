@@ -1,3 +1,5 @@
+from typing import List
+
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 from django.db import transaction
@@ -5,10 +7,13 @@ from ninja import Router
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from classes.models import Class
+from classes.schemas import ClassResponseSchema
 from .authentication import jwt_auth
 from .schemas import ErrorResponseSchema, ErrorDetailSchema
+from .schemas import ProfileSchema, RoleResponseSchema
 from .schemas import TokenRefreshSchema, RefreshTokenSchema
-from .schemas import UserSchema, TokenSchema, LoginSchema, ProfileSchema
+from .schemas import UserSchema, TokenSchema, LoginSchema
 
 User = get_user_model()
 
@@ -109,3 +114,28 @@ def profile(request, user_id: int):
         )
     except Exception as e:
         return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
+
+
+@user_router.get('/{user_id}/role', auth=jwt_auth,
+                 response={200: RoleResponseSchema, 404: ErrorResponseSchema, 401: ErrorResponseSchema})
+def get_user_role(request, user_id: int):
+    try:
+        user = User.objects.get(id=user_id)
+        return 200, RoleResponseSchema(role=user.role)
+    except User.DoesNotExist:
+        return 404, {"errors": [ErrorDetailSchema(field="user_id", message="User not found")]}
+    except Exception as e:
+        return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
+
+
+@user_router.get('/{user_id}/classes', auth=jwt_auth, response={200: List[ClassResponseSchema], 400: dict})
+def list_classes(request, user_id: int):
+    user = request.user
+    if user_id != user.id:
+        return 400, {"error": "You can only view your own classes"}
+    if user.role == 'teacher':
+        classes = Class.objects.filter(teacher=user)
+    else:
+        classes = Class.objects.filter(memberships__student=user)
+    return [ClassResponseSchema(id=class_instance.id, name=class_instance.name, teacher_id=class_instance.teacher_id)
+            for class_instance in classes]

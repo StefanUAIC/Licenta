@@ -20,3 +20,25 @@ export function getAuthHeaders() {
 		}
 	};
 }
+
+export function isAuthenticated(accessToken: string | null): boolean {
+	if (!accessToken) return false;
+
+	try {
+		const payload = JSON.parse(atob(accessToken.split('.')[1]));
+		const currentTime = Date.now() / 1000;
+		return payload.exp > currentTime;
+	} catch (e) {
+		return false;
+	}
+}
+
+export const getUserIDFromJWT = (accessToken: string | null): number => {
+	if (!accessToken) {
+		console.log('No access token found');
+		return 0;
+	} else {
+		const payload = JSON.parse(atob(accessToken.split('.')[1]));
+		return payload.user_id;
+	}
+};

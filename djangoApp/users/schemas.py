@@ -67,3 +67,7 @@ class TokenRefreshSchema(Schema):
 
 class RefreshTokenSchema(Schema):
     refresh: str
+
+
+class RoleResponseSchema(Schema):
+    role: str

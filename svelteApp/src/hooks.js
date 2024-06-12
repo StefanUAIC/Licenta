@@ -2,14 +2,14 @@
 // noinspection JSUnusedGlobalSymbols
 
 import { redirect } from '@sveltejs/kit';
-import { isAuthenticated, refreshAccessToken } from '$lib/auth_api';
+import { isAuthenticated } from '$lib/utils';
+import { refreshAccessToken } from '$lib/auth_api';
 
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
 	const { url } = event;
 	let access_token = event.cookies.get('access');
 	const unprotectedRoutes = ['/', '/login', '/register'];
-
 	if (!unprotectedRoutes.includes(url.pathname)) {
 		if (!isAuthenticated(access_token)) {
 			let refresh_token = event.cookies.get('refresh');
@@ -17,6 +17,7 @@ export async function handle({ event, resolve }) {
 				try {
 					access_token = await refreshAccessToken(refresh_token);
 					event.cookies.set('access', access_token.access, {
+						httpOnly: false,
 						maxAge: 3600,
 						sameSite: 'strict',
 						path: '/'

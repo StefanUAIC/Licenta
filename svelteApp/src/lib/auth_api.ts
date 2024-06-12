@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_AUTH_URL = import.meta.env.VITE_API_AUTH_URL;
+const API_USERS_URL = import.meta.env.VITE_API_USERS_URL;
 
 interface UserSchema {
 	username: string;
@@ -23,9 +23,14 @@ interface AccessTokenSchema {
 	access: string;
 }
 
+
+export interface RoleResponse {
+	role: 'student' | 'teacher';
+}
+
 export const login = async (username: string, password: string): Promise<TokenSchema> => {
 	try {
-		const response = await axios.post<TokenSchema>(`${API_AUTH_URL}/login`, { username, password });
+		const response = await axios.post<TokenSchema>(`${API_USERS_URL}/login`, { username, password });
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
@@ -39,7 +44,7 @@ export const login = async (username: string, password: string): Promise<TokenSc
 
 export const register = async (user: UserSchema): Promise<TokenSchema> => {
 	try {
-		const response = await axios.post<TokenSchema>(`${API_AUTH_URL}/register`, user);
+		const response = await axios.post<TokenSchema>(`${API_USERS_URL}/register`, user);
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
@@ -51,22 +56,10 @@ export const register = async (user: UserSchema): Promise<TokenSchema> => {
 	}
 };
 
-
-export function isAuthenticated(accessToken: string | null): boolean {
-	if (!accessToken) return false;
-
-	try {
-		const payload = JSON.parse(atob(accessToken.split('.')[1]));
-		const currentTime = Date.now() / 1000;
-		return payload.exp > currentTime;
-	} catch (e) {
-		return false;
-	}
-}
 
 export const refreshAccessToken = async (refreshToken: string): Promise<AccessTokenSchema> => {
 	try {
-		const response = await axios.post<AccessTokenSchema>(`${API_AUTH_URL}/refresh`, { refresh: refreshToken });
+		const response = await axios.post<AccessTokenSchema>(`${API_USERS_URL}/refresh`, { refresh: refreshToken });
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
@@ -77,3 +70,5 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AccessTo
 		}
 	}
 };
+
+

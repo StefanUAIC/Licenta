@@ -3,17 +3,20 @@ from typing import List
 
 from ninja import Router
 
+from problems.models import Problem
 from solutions.models import Solution
 from solutions.schemas import SolutionSchema
-from problems.models import Problem
+from users.authentication import jwt_auth
 from .models import Class, Membership, Homework
-from .schemas import ClassSchema, MembershipSchema, HomeworkSchema
-from .schemas import CreateClassSchema, CreateHomeworkSchema, JoinClassSchema
+from .schemas import ClassResponseSchema, ErrorResponseSchema
+from .schemas import ClassSchema, HomeworkSchema
+from .schemas import CreateClassSchema, CreateHomeworkSchema
+from .schemas import JoinClassSchema, JoinClassResponseSchema
 
 classes_router = Router(tags=["Classes"])
 
 
-@classes_router.post('/create/', response={201: ClassSchema, 400: dict})
+@classes_router.post('/create', auth=jwt_auth, response={201: ClassSchema, 400: dict})
 def create_class(request, payload: CreateClassSchema):
     user = request.user
     if user.role != 'teacher':
@@ -22,17 +25,19 @@ def create_class(request, payload: CreateClassSchema):
     return 201, ClassSchema.from_orm(class_instance)
 
 
-@classes_router.post('/join/', response={201: MembershipSchema, 400: dict})
+@classes_router.post('/join', auth=jwt_auth, response={201: JoinClassResponseSchema, 400: dict})
 def join_class(request, payload: JoinClassSchema):
     user = request.user
     class_instance = Class.objects.filter(join_code=payload.join_code).first()
     if not class_instance:
         return 400, {"error": "Invalid join code"}
-    membership = Membership.objects.create(student=user, class_instance=class_instance)
-    return 201, MembershipSchema.from_orm(membership)
+    if Membership.objects.filter(student=user, class_instance=class_instance).exists():
+        return 400, {"error": "You are already enrolled in this class"}
+    Membership.objects.create(student=user, class_instance=class_instance)
+    return 201, JoinClassResponseSchema(class_id=class_instance.id, name=class_instance.name)
 
 
-@classes_router.post('/{class_id}/add_homework/', response={201: HomeworkSchema, 400: dict})
+@classes_router.post('/{class_id}/add_homework', auth=jwt_auth, response={201: HomeworkSchema, 400: dict})
 def add_homework(request, class_id: int, payload: CreateHomeworkSchema):
     user = request.user
     class_instance = Class.objects.get(id=class_id)
@@ -43,7 +48,7 @@ def add_homework(request, class_id: int, payload: CreateHomeworkSchema):
     return 201, HomeworkSchema.from_orm(homework)
 
 
-@classes_router.get('/{class_id}/submissions/', response=List[SolutionSchema])
+@classes_router.get('/{class_id}/submissions', auth=jwt_auth, response=List[SolutionSchema])
 def list_submissions(request, class_id: int):
     user = request.user
     class_instance = Class.objects.get(id=class_id)
@@ -53,7 +58,7 @@ def list_submissions(request, class_id: int):
     return 400, {"error": "Only the teacher of the class can view submissions"}
 
 
-@classes_router.post('/{homework_id}/submit/', response={201: SolutionSchema, 400: dict})
+@classes_router.post('/{homework_id}/submit', auth=jwt_auth, response={201: SolutionSchema, 400: dict})
 def submit_homework(request, homework_id: int, payload: SolutionSchema):
     user = request.user
     homework = Homework.objects.get(id=homework_id)
@@ -68,3 +73,17 @@ def submit_homework(request, homework_id: int, payload: SolutionSchema):
         updated_at=datetime.now()
     )
     return 201, SolutionSchema.from_orm(solution)
+
+
+@classes_router.get('/{class_id}', auth=jwt_auth, response={200: ClassSchema, 400: dict})
+def get_class_info(request, class_id: int):
+    user = request.auth
+    try:
+        class_instance = Class.objects.get(id=class_id)
+    except Class.DoesNotExist:
+        return 400, {"error": "Class not found"}
+
+    if not Membership.objects.filter(student=user, class_instance=class_instance).exists():
+        return 400, {"error": "You are not enrolled in this class"}
+
+    return 200, ClassSchema.from_orm(class_instance)
