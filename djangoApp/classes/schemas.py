@@ -31,20 +31,8 @@ class MembershipSchema(Schema):
     class_instance_id: int
 
 
-class HomeworkSchema(Schema):
-    id: int
-    class_instance_id: int
-    problem_id: int
-    due_date: str
-
-
 class CreateClassSchema(Schema):
     name: str
-
-
-class CreateHomeworkSchema(Schema):
-    problem_id: int
-    due_date: str
 
 
 class JoinClassSchema(Schema):
