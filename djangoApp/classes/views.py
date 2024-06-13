@@ -1,17 +1,15 @@
-from datetime import datetime
 from typing import List
 
+from django.shortcuts import get_object_or_404
 from ninja import Router
 
-from problems.models import Problem
 from solutions.models import Solution
 from solutions.schemas import SolutionSchema
 from users.authentication import jwt_auth
-from .models import Class, Membership, Homework
-from .schemas import ClassResponseSchema, ErrorResponseSchema
-from .schemas import ClassSchema, HomeworkSchema
-from .schemas import CreateClassSchema, CreateHomeworkSchema
-from .schemas import JoinClassSchema, JoinClassResponseSchema
+from users.schemas import ProfileSchema
+from .models import Class, Membership, User
+from .schemas import ClassSchema
+from .schemas import CreateClassSchema, JoinClassSchema, JoinClassResponseSchema
 
 classes_router = Router(tags=["Classes"])
 
@@ -37,17 +35,6 @@ def join_class(request, payload: JoinClassSchema):
     return 201, JoinClassResponseSchema(class_id=class_instance.id, name=class_instance.name)
 
 
-@classes_router.post('/{class_id}/add_homework', auth=jwt_auth, response={201: HomeworkSchema, 400: dict})
-def add_homework(request, class_id: int, payload: CreateHomeworkSchema):
-    user = request.user
-    class_instance = Class.objects.get(id=class_id)
-    if class_instance.teacher != user:
-        return 400, {"error": "Only the teacher of the class can add homework"}
-    problem = Problem.objects.get(id=payload.problem_id)
-    homework = Homework.objects.create(class_instance=class_instance, problem=problem, due_date=payload.due_date)
-    return 201, HomeworkSchema.from_orm(homework)
-
-
 @classes_router.get('/{class_id}/submissions', auth=jwt_auth, response=List[SolutionSchema])
 def list_submissions(request, class_id: int):
     user = request.user
@@ -58,23 +45,6 @@ def list_submissions(request, class_id: int):
     return 400, {"error": "Only the teacher of the class can view submissions"}
 
 
-@classes_router.post('/{homework_id}/submit', auth=jwt_auth, response={201: SolutionSchema, 400: dict})
-def submit_homework(request, homework_id: int, payload: SolutionSchema):
-    user = request.user
-    homework = Homework.objects.get(id=homework_id)
-    if not Membership.objects.filter(student=user, class_instance=homework.class_instance).exists():
-        return 400, {"error": "Only students enrolled in the class can submit homework"}
-    solution = Solution.objects.create(
-        problem=homework.problem,
-        user=user,
-        code=payload.code,
-        language_id=payload.language_id,
-        created_at=datetime.now(),
-        updated_at=datetime.now()
-    )
-    return 201, SolutionSchema.from_orm(solution)
-
-
 @classes_router.get('/{class_id}', auth=jwt_auth, response={200: ClassSchema, 400: dict})
 def get_class_info(request, class_id: int):
     user = request.auth
@@ -83,7 +53,30 @@ def get_class_info(request, class_id: int):
     except Class.DoesNotExist:
         return 400, {"error": "Class not found"}
 
-    if not Membership.objects.filter(student=user, class_instance=class_instance).exists():
+    if not (Membership.objects.filter(student=user, class_instance=class_instance).exists()
+            or class_instance.teacher == user):
         return 400, {"error": "You are not enrolled in this class"}
 
     return 200, ClassSchema.from_orm(class_instance)
+
+
+@classes_router.delete('/{class_id}', auth=jwt_auth, response={204: None, 400: dict})
+def delete_class(request, class_id: int):
+    user = request.user
+    class_instance = get_object_or_404(Class, id=class_id)
+    if class_instance.teacher != user:
+        return 400, {"error": "Only the teacher of the class can delete the class"}
+    class_instance.delete()
+    return 204, None
+
+
+@classes_router.get('/{class_id}/students', auth=jwt_auth, response={200: List[ProfileSchema], 400: dict})
+def list_class_students(request, class_id: int):
+    user = request.user
+    class_instance = get_object_or_404(Class, id=class_id)
+
+    if user.role != 'teacher' and not Membership.objects.filter(student=user, class_instance=class_instance).exists():
+        return 400, {"error": "You do not have permission to view the students of this class"}
+
+    students = User.objects.filter(student_memberships__class_instance=class_instance)
+    return 200, [ProfileSchema.from_orm(student) for student in students]

@@ -1,6 +1,7 @@
 // src/lib/classes_api.ts
 import axios from 'axios';
 import { getAuthHeaders } from '$lib/utils';
+import type { ProfileSchema } from '$lib/users_api';
 
 const API_CLASSES_URL = import.meta.env.VITE_API_CLASSES_URL;
 
@@ -58,6 +59,20 @@ export const joinClass = async (payload: JoinClassPayload): Promise<ClassRespons
 export const getClassInfo = async (classId: number): Promise<ClassInfoResponse> => {
 	try {
 		const response = await axios.get<ClassInfoResponse>(`${API_CLASSES_URL}/${classId}`, getAuthHeaders());
+		return response.data;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			console.log(error.response.data.error);
+			throw new Error(error.response.data.error);
+		} else {
+			throw new Error('An unexpected error occurred');
+		}
+	}
+};
+
+export const getClassStudents = async (classId: number): Promise<ProfileSchema[]> => {
+	try {
+		const response = await axios.get<ProfileSchema[]>(`${API_CLASSES_URL}/${classId}/students`, getAuthHeaders());
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {
