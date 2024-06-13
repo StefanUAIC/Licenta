@@ -2,20 +2,17 @@
 	import { onMount } from 'svelte';
 	import type { CreatePostData, Post } from '$lib/posts_api';
 	import { createPost, fetchPosts } from '$lib/posts_api';
-	import { writable } from 'svelte/store';
 
 	let posts: Post[] = [];
 	let newPost = {
 		title: '',
 		content: ''
 	};
-	let isTeacher = writable(false);
 
 	export let userIsTeacher = false;
 
 	onMount(async () => {
 		posts = await fetchPosts();
-		isTeacher.set(userIsTeacher);
 	});
 
 	const addPost = async () => {
@@ -102,9 +99,9 @@
     }
 </style>
 
-<div class="bg-white shadow-md rounded-lg p-6">
-	<h3 class="text-xl font-bold mb-4">Add a new post</h3>
-	{#if $isTeacher}
+{#if userIsTeacher}
+	<div class="bg-white shadow-md rounded-lg p-6">
+		<h3 class="text-xl font-bold mb-4">Add a new post</h3>
 		<form on:submit|preventDefault={addPost}>
 			<div class="mb-4">
 				<label for="title" class="block mb-2">Title:</label>
@@ -119,8 +116,8 @@
 			<button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">Add post
 			</button>
 		</form>
-	{/if}
-</div>
+	</div>
+{/if}
 
 <div class="mt-8">
 	{#each posts as post (post.id)}
