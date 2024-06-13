@@ -132,8 +132,6 @@
 		}
 	};
 </script>
-
-
 <template>
 	<div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-12">
 		<div class="bg-white p-10 rounded-lg shadow-lg w-full max-w-2xl relative">
@@ -230,4 +228,3 @@
         color: red;
     }
 </style>
-
