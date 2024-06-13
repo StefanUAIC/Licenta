@@ -23,7 +23,8 @@
 					content: newPost.content
 				};
 				const createdPost = await createPost(post);
-				posts = [createdPost, ...posts];
+				console.log('Post created:', createdPost);
+				alert('Post created successfully.');
 				newPost.title = '';
 				newPost.content = '';
 			} catch (error) {
