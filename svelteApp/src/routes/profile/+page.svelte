@@ -3,8 +3,8 @@
 	import { type Writable, writable } from 'svelte/store';
 	import { faker } from '@faker-js/faker';
 	import { onMount } from 'svelte';
-	import { getProfile, getUserIDFromJWT, type ProfileSchema } from '$lib/users_api';
-	import { getCookie } from '$lib/utils';
+	import { getProfile,  type ProfileSchema } from '$lib/users_api';
+	import { getCookie, getUserIDFromJWT } from '$lib/utils';
 
 	let profilePromise: Promise<ExtendedProfileSchema> | null = null;
 	let user_id: number;

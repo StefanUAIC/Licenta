@@ -13,6 +13,7 @@
 	import flatpickr from 'flatpickr';
 	import 'flatpickr/dist/flatpickr.css';
 
+
 	let classId: number;
 	let classInfo: ClassInfoResponse | null = null;
 	let homeworks: Homework[] = [];
