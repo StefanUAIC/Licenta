@@ -5,6 +5,7 @@ from ninja import NinjaAPI
 from classes.views import classes_router
 from code_submission.views import code_submission_router
 from homeworks.views import homework_router
+from posts.views import posts_router
 from problems.views import problems_router
 from solutions.views import solutions_router
 from users.views import user_router
@@ -17,6 +18,7 @@ api.add_router("/code_submission", code_submission_router)
 api.add_router("/classes", classes_router)
 api.add_router("/solutions", solutions_router)
 api.add_router("/homeworks", homework_router)
+api.add_router("/posts", posts_router)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
