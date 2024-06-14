@@ -11,11 +11,17 @@ class PostAdmin(admin.ModelAdmin):
     actions = ['accept_posts', 'reject_posts']
 
     def accept_posts(self, request, queryset):
-        queryset.update(status='ACCEPTED')
+        for post in queryset:
+            post.status = 'ACCEPTED'
+            post.save()
+            message = f'Your post "{post.title}" has been accepted.'
 
     accept_posts.short_description = 'Accept selected posts'
 
     def reject_posts(self, request, queryset):
-        queryset.update(status='REJECTED')
+        for post in queryset:
+            post.status = 'REJECTED'
+            post.save()
+            message = f'Your post "{post.title}" has been rejected.'
 
     reject_posts.short_description = 'Reject selected posts'

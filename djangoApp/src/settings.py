@@ -57,6 +57,7 @@ INSTALLED_APPS += [
     'problems',
     'homeworks',
     'solutions',
+    'notifications',
     'code_submission'
 ]
 
