@@ -1,23 +1,24 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-	import { getProfile, getUserClasses, getUserRole } from '$lib/users_api';
-    import { getCookie, getUserIDFromJWT } from '$lib/utils';
-    import type { ClassResponse, CreateClassPayload, JoinClassPayload } from '$lib/classes_api';
-    import { createClass, joinClass } from '$lib/classes_api';
-    import { goto } from '$app/navigation';
-    import { type PaginationSettings, Paginator } from '@skeletonlabs/skeleton';
+    import {onMount} from 'svelte';
+    import {getProfile, getUserClasses, getUserRole} from '$lib/users_api';
+    import {getCookie, getUserIDFromJWT} from '$lib/utils';
+    import type {ClassResponse, CreateClassPayload, JoinClassPayload} from '$lib/classes_api';
+    import {createClass, joinClass} from '$lib/classes_api';
+    import {goto} from '$app/navigation';
+    import {type PaginationSettings, Paginator} from '@skeletonlabs/skeleton';
+    import "@fortawesome/fontawesome-free/js/all.min.js"
 
     let role: 'student' | 'teacher' | null = null;
     let error: string | null = null;
     let accessToken: string | null = null;
     let userClasses: ClassResponse[] = [];
-    let teacherName: string | null = null;
+    let userName: string | null = null;
 
     let classesPaginationSettings = {
         page: 0,
-        limit: 3,
+        limit: 10,
         size: userClasses.length,
-        amounts: [1, 2, 3, 5, userClasses.length]
+        amounts: [1, 2, 3, 5, 10]
     } satisfies PaginationSettings;
 
     let state = {
@@ -52,14 +53,17 @@
             role = roleResponse.role;
 
             if (role === 'teacher') {
-                teacherName = 'Professor ' + ((await getProfile(user_id)).first_name); // Replace this with actual logic to get teacher's name
+                userName = 'Teacher ' + ((await getProfile(user_id)).first_name); // Replace this with actual logic to get teacher's name
+            } else if (role === 'student') {
+                userName = 'Student ' + ((await getProfile(user_id)).first_name); // Replace this with actual logic to get teacher's name
             }
 
             userClasses = await getUserClasses(user_id);
-            classesPaginationSettings.size = userClasses.length; // Update pagination size
+            classesPaginationSettings.size = userClasses.length;
+            classesPaginationSettings.amounts = [1, 2, 3, 5, 10, userClasses.length];
+            classesPaginationSettings.amounts = classesPaginationSettings.amounts.filter((item, index) => classesPaginationSettings.amounts.indexOf(item) === index);
             console.log(userClasses);
             console.log(userClasses[0].name);
-
             console.log('User role:', role);
             console.log('User classes:', userClasses);
         } catch (err) {
@@ -73,7 +77,7 @@
             const joinCode = prompt('Enter the join code:');
             if (!joinCode) return;
 
-            const payload: JoinClassPayload = { join_code: joinCode };
+            const payload: JoinClassPayload = {join_code: joinCode};
             const classResponse = await joinClass(payload);
             alert(`Joined class: ${classResponse.name}`);
             await goto(`/classes/${classResponse.id}`);
@@ -88,7 +92,7 @@
             const className = prompt('Enter the class name:');
             if (!className) return;
 
-            const payload: CreateClassPayload = { name: className };
+            const payload: CreateClassPayload = {name: className};
             const classResponse = await createClass(payload);
             alert(`Created class: ${classResponse.name}`);
             await goto(`/classes/${classResponse.id}`);
@@ -98,91 +102,118 @@
         }
     };
 
-    const goToClass = (classId: number) => {
-        goto(`/classes/${classId}`);
-    };
-
     const handleEditClass = async (classId: number) => {
         // Implement edit class functionality
         console.log('Edit class', classId);
     };
 
-    // const handleDeleteClass = async (classId: number) => {
-    //     try {
-    //         await deleteClass(classId);
-    //         alert('Class deleted');
-    //         // Refresh the classes list or remove the class from userClasses array
-    //         userClasses = userClasses.filter((classItem) => classItem.id !== classId);
-    //     } catch (err) {
-    //         error = err.message;
-    //         console.error(err);
-    //     }
-    // };
+    const handleDeleteClass = async (classId: number) => {
+        // Implement delete class functionality
+        console.log('Delete class', classId);
+    };
 </script>
 
 <template>
-    <div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-6">
-        <div class="flex flex-col sm:flex-row w-full max-w-6xl space-y-6 sm:space-y-0 sm:space-x-6">
-            <div class="w-full sm:w-1/2 flex flex-col items-center bg-white p-8 rounded-lg shadow-lg">
+    <div class="min-h-screen flex flex-col items-center justify-center py-6">
+        <div class="flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6">
+            <div class="max-w-screen-lg sm:w-1/2 flex flex-col items-center p-8 rounded-lg">
                 {#if role === 'teacher'}
-                    <img src="teacher_desk.png" alt="Teacher Desk" class="mb-4">
-                    <button on:click={handleCreateClass} class="w-full bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 flex items-center justify-center space-x-2">
+                    <img src="teacher_desk.png" alt="Teacher Desk" class="mb-4 w-6/12">
+                    <button on:click={handleCreateClass}
+                            class="bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 flex items-center justify-center space-x-3">
                         <i class="fa fa-plus"></i> <span>Create a class</span>
                     </button>
                 {:else if role === 'student'}
                     <img src="student_desk.png" alt="Student Desk" class="mb-4">
-                    <button on:click={handleJoinClass} class="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 flex items-center justify-center space-x-2">
-                        <img src="join_icon.png" alt="Join Icon" class="w-4 h-4"> <span>Join a class</span>
+                    <button on:click={handleJoinClass}
+                            class="bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 flex items-center justify-center space-x-3">
+                        <img src="join_icon.png" alt="Join Icon" class="w-auto h-8"> <span>Join a class</span>
                     </button>
                 {/if}
             </div>
-            <div class="w-full sm:w-1/2 bg-white p-8 rounded-lg shadow-lg">
+            <div class="sm:w-1/2 p-8 rounded-lg shadow-2xl">
                 <div class="w-full space-y-4 text-token mt-4">
-                    <table class="min-w-full divide-y divide-gray-200 shadow-lg">
-                        <thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white rounded-full">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md">
-                                {#if teacherName}{teacherName}'s classes{/if}
+                            <th colspan="3"
+                                class="px-6 py-6 text-left text-xs font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md text-center">
+                                {#if userName}{userName}'s classes{/if}
                             </th>
                         </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
+                        <tbody class="bg-transparent divide-y divide-gray-200 gap-y-px">
                         {#each classesBodySliced as classItem, index}
                             <tr class="rounded-md">
-                                <td class="px-6 py-4 whitespace-nowrap rounded-l-md">
-                                    <div class="w-8 h-8 bg-blue-500 text-white flex items-center justify-center rounded-full">
+                                <td class="whitespace-nowrap w-fit">
+                                    <div class="w-16 h-16 bg-blue-500 text-white  flex items-center justify-center rounded-full text-2xl">
                                         {index + 1}
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-1 whitespace-nowrap class-name bg-white rounded-l-full">
                                     <a href="/classes/{classItem.id}"
                                        class="text-indigo-600 hover:text-indigo-900">{classItem.name}</a>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">27 students</td>
-                                <td class="px-6 py-4 whitespace-nowrap rounded-r-md">
-                                    <button class="text-blue-600 hover:text-blue-900">
-                                        <i class="fa-thin fa-pen-to-square"></i>
-                                    </button>
-                                    <button class="text-red-600 hover:text-red-900 ml-4">
-                                        <i class="fa-light fa-xmark"></i>
-                                    </button>
+                                <td class="px-6 py-4 whitespace-nowrap bg-white rounded-r-full text-right">27 students
                                 </td>
+                                {#if role === 'teacher'}
+                                    <td class="whitespace-nowrap rounded-r-md class-actions flex justify-evenly ">
+                                        <button on:click={() => handleEditClass(classItem.id)}
+                                                class="text-blue-600 hover:text-blue-900">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em"
+                                                 viewBox="0 0 24 24">
+                                                <g fill="none" stroke="gray" stroke-linecap="round"
+                                                   stroke-linejoin="round" stroke-width="0.75">
+                                                    <path d="M19.09 14.441v4.44a2.37 2.37 0 0 1-2.369 2.369H5.12a2.37 2.37 0 0 1-2.369-2.383V7.279a2.356 2.356 0 0 1 2.37-2.37H9.56"/>
+                                                    <path d="M6.835 15.803v-2.165c.002-.357.144-.7.395-.953l9.532-9.532a1.362 1.362 0 0 1 1.934 0l2.151 2.151a1.36 1.36 0 0 1 0 1.934l-9.532 9.532a1.361 1.361 0 0 1-.953.395H8.197a1.362 1.362 0 0 1-1.362-1.362M19.09 8.995l-4.085-4.086"/>
+                                                </g>
+                                            </svg>
+                                        </button>
+                                        <button on:click={() => handleDeleteClass(classItem.id)}
+                                                class="text-red-600 hover:text-red-900">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em"
+                                                 viewBox="0 0 40 40">
+                                                <path fill="red"
+                                                      d="M21.499 19.994L32.755 8.727a1.064 1.064 0 0 0-.001-1.502c-.398-.396-1.099-.398-1.501.002L20 18.494L8.743 7.224c-.4-.395-1.101-.393-1.499.002a1.05 1.05 0 0 0-.309.751c0 .284.11.55.309.747L18.5 19.993L7.245 31.263a1.064 1.064 0 0 0 .003 1.503c.193.191.466.301.748.301h.006c.283-.001.556-.112.745-.305L20 21.495l11.257 11.27c.199.198.465.308.747.308a1.058 1.058 0 0 0 1.061-1.061c0-.283-.11-.55-.31-.747z"/>
+                                            </svg>
+                                        </button>
+                                    </td>
+                                {/if}
                             </tr>
                         {/each}
                         </tbody>
                     </table>
                     <Paginator bind:settings={classesPaginationSettings} on:page={onPageChange}
-                               on:amount={onAmountChange}
-                               showFirstLastButtons={state.firstLast} showPreviousNextButtons={state.previousNext}
-                               controlVariant="variant-soft bg-white"
-                               select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+                               on:amount={onAmountChange} showFirstLastButtons={state.firstLast}
+                               showPreviousNextButtons={state.previousNext} controlVariant="variant-soft bg-white"
+                               select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"/>
                 </div>
             </div>
         </div>
     </div>
 </template>
+
 <style>
     .error {
         color: red;
+    }
+
+    table {
+        border-collapse: separate;
+        border-spacing: 0 1rem;
+    }
+
+
+
+    table thead th:first-child {
+        border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+
+    }
+
+
+    table thead th:last-child {
+        border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
     }
 </style>

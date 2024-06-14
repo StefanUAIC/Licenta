@@ -418,10 +418,13 @@
 
     table thead th:first-child {
         border-top-left-radius: 0.375rem;
+        border-bottom-left-radius: 0.375rem;
+
     }
 
     table thead th:last-child {
         border-top-right-radius: 0.375rem;
+        border-bottom-right-radius: 0.375rem;
     }
 
     table tbody tr:first-child td:first-child {
