@@ -30,6 +30,13 @@
 		currentPage = path;
 	}
 
+	function logout(event: Event) {
+		event.preventDefault();
+		document.cookie = 'access=; Max-Age=0; path=/';
+		document.cookie = 'refresh=; Max-Age=0; path=/';
+		window.location.href = '/';
+	}
+
 	onMount(async () => {
 		const notifications = await fetchNotifications();
 		hasUnreadNotifications.set(notifications.length > 0);
@@ -91,7 +98,7 @@
     .active-page::before {
         content: '';
         position: absolute;
-        left: -0.625rem;
+        left: -1rem;
         top: 0;
         bottom: 0;
         width: 0.25rem;
@@ -101,7 +108,7 @@
     .nav-link {
         color: white;
         padding: 1rem;
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         display: flex;
         align-items: center;
     }
@@ -153,6 +160,10 @@
         background-color: red;
         border-radius: 50%;
     }
+
+    .color-nav {
+        background-color: #009fff !important;
+    }
 </style>
 
 <AppShell slotSidebarLeft="w-56 p-4">
@@ -177,7 +188,7 @@
 		</button>
 
 		<nav
-			class="list-nav fixed top-0 left-0 w-56 h-full bg-indigo-600 z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
+			class="list-nav fixed top-0 left-0 w-56 h-full color-nav z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
 			<ul>
 				<li class="relative mb-2">
 					<a href="/posts" on:click={() => updateCurrentPage('/posts')}
@@ -207,6 +218,12 @@
 					<a href="/classes" on:click={() => updateCurrentPage('/classes')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/classes' ? 'active-page' : ''}`}>
 						<i class="fas fa-users mr-2"></i> Classes
+					</a>
+				</li>
+				<li class="relative mb-2">
+					<a href="/" on:click={logout}
+					   class="nav-link block rounded-md px-4 py-2">
+						<i class="fas fa-sign-out-alt mr-2"></i> Logout
 					</a>
 				</li>
 			</ul>

@@ -193,7 +193,7 @@
 
 	<div class="bg-black/5 p-6 text-center">
 		<span>© 2024:</span>
-		<a class="font-semibold" href="https://tw-elements.com/"
+		<a class="font-semibold" href="#!"
 		>{app_name}</a
 		>
 	</div>

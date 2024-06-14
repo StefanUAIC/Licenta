@@ -23,12 +23,6 @@ export const fetchPosts = async (): Promise<Post[]> => {
 };
 
 export const createPost = async (data: CreatePostData): Promise<Post> => {
-	const token = getCookie('access');
-	const userId = getUserIDFromJWT(token);
-	const userRole = await getUserRole(userId);
-	if (userRole.role !== 'teacher') {
-		throw new Error('Only teachers can create posts');
-	}
 	const response = await axios.post<Post>(`${API_POSTS_URL}/`, data, getAuthHeaders());
 	return response.data;
 };

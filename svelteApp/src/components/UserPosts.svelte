@@ -21,6 +21,7 @@
 					title: newPost.title,
 					content: newPost.content
 				};
+				console.log('Creating post:', post);
 				const createdPost = await createPost(post);
 				console.log('Post created:', createdPost);
 				alert('Post created successfully.');
