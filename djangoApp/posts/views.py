@@ -12,8 +12,6 @@ posts_router = Router(tags=['Posts'])
 @posts_router.post("/", auth=jwt_auth, response={201: PostOutSchema, 403: dict})
 def create_post(request, payload: PostSchema):
     user = request.auth
-    if not user.role == 'teacher':
-        return 403, {"error": "Only teachers can create posts"}
     post = Post.objects.create(
         title=payload.title,
         content=payload.content,
