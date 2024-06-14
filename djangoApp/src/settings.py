@@ -52,10 +52,12 @@ INSTALLED_APPS += [
 
 INSTALLED_APPS += [
     'users',
+    'posts',
     'classes',
     'problems',
     'homeworks',
     'solutions',
+    'notifications',
     'code_submission'
 ]
 

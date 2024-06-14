@@ -1,13 +1,11 @@
 from typing import List
-
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from ninja import Router
-
 from .models import Problem, TestCase
 from .schemas import ProblemSchema, CreateProblemSchema, TestCaseSchema, CreateTestCaseSchema
-
 from users.authentication import jwt_auth
+from notifications.models import Notification
 
 problems_router = Router(tags=["Problems"])
 User = get_user_model()
@@ -17,7 +15,7 @@ User = get_user_model()
 def list_problems(request):
     if not request.user.is_authenticated:
         print("User is not authenticated")
-    problems = Problem.objects.all()
+    problems = Problem.objects.filter(status='ACCEPTED')
     return [ProblemSchema.from_orm(problem) for problem in problems]
 
 
@@ -40,7 +38,7 @@ def create_problem(request, payload: CreateProblemSchema):
 
 @problems_router.get('/{problem_id}/', auth=jwt_auth, response={200: ProblemSchema, 404: dict})
 def get_problem(request, problem_id: int):
-    problem = get_object_or_404(Problem, id=problem_id)
+    problem = get_object_or_404(Problem, id=problem_id, status='ACCEPTED')
     return 200, ProblemSchema.from_orm(problem)
 
 
