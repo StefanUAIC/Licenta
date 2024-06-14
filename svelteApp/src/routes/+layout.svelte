@@ -38,6 +38,9 @@
 	}
 
 	onMount(async () => {
+		if (currentPage === '/' || currentPage === '/login' || currentPage === '/register') {
+			return;
+		}
 		const notifications = await fetchNotifications();
 		hasUnreadNotifications.set(notifications.length > 0);
 	});
