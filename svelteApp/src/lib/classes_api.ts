@@ -24,10 +24,16 @@ export interface ClassResponse {
 export interface ClassInfoResponse {
 	id: number;
 	name: string;
+	tag: string;
 	teacher_id: number;
 	created_at: string;
 	updated_at: string;
 	join_code: string;
+}
+
+export interface JoinClassResponse {
+	class_id: number;
+	name: string;
 }
 
 export const createClass = async (payload: CreateClassPayload): Promise<ClassResponse> => {
@@ -44,9 +50,9 @@ export const createClass = async (payload: CreateClassPayload): Promise<ClassRes
 	}
 };
 
-export const joinClass = async (payload: JoinClassPayload): Promise<ClassResponse> => {
+export const joinClass = async (payload: JoinClassPayload): Promise<JoinClassResponse> => {
 	try {
-		const response = await axios.post<ClassResponse>(`${API_CLASSES_URL}/join`, payload, getAuthHeaders());
+		const response = await axios.post<JoinClassResponse>(`${API_CLASSES_URL}/join`, payload, getAuthHeaders());
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {

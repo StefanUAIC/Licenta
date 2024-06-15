@@ -19,6 +19,7 @@ export interface CodeSubmissionSchema {
 	source_code: string;
 	language_id: number;
 	problem_id: number;
+	homework_id?: number | null;
 }
 
 export const submitCode = async (submission: CodeSubmissionSchema): Promise<CodeSubmissionResult[]> => {

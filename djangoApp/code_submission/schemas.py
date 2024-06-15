@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from ninja import Schema
 
@@ -7,6 +7,7 @@ class CodeSubmissionSchema(Schema):
     source_code: str
     language_id: int
     problem_id: int
+    homework_id: Optional[int] = None
 
 
 class TestCaseResultSchema(Schema):

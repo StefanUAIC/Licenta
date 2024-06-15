@@ -5,6 +5,7 @@ import requests
 from dotenv import load_dotenv
 from ninja import Router
 
+from homeworks.models import Homework
 from problems.models import Problem, TestCase
 from solutions.helpers import create_solution
 from users.authentication import jwt_auth
@@ -38,7 +39,14 @@ def submit_code(request, payload: CodeSubmissionSchema):
         percentage_passed = int((passed_count / total_count) * 100) if total_count else 0
 
         user = request.auth
-        create_solution(user, problem, payload.source_code, payload.language_id, percentage_passed)
+        homework = None
+        if payload.homework_id:
+            try:
+                homework = Homework.objects.get(id=payload.homework_id)
+            except Homework.DoesNotExist:
+                return 404, {"error": "Homework not found"}
+
+        create_solution(user, problem, payload.source_code, payload.language_id, percentage_passed, homework)
 
         return 200, {"results": results}
 

@@ -1,8 +1,16 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { type ClassInfoResponse, getClassInfo, getClassStudents } from '$lib/classes_api';
-	import { createHomework, deleteHomework, getClassHomeworks, type Homework } from '$lib/homeworks_api';
-	import { getUserRole, type ProfileSchema } from '$lib/users_api';
+	import type { ClassInfoResponse } from '$lib/classes_api';
+	import { getClassInfo, getClassStudents } from '$lib/classes_api';
+	import {
+		createHomework,
+		deleteHomework,
+		getClassHomeworks,
+		getHomeworkSubmissions,
+		type Homework,
+		type Solution
+	} from '$lib/homeworks_api';
+	import { getUserRole, getProfile, type ProfileSchema } from '$lib/users_api';
 	import { getAllProblems, type ProblemSchema } from '$lib/problems_api';
 	import { getCookie, getUserIDFromJWT } from '$lib/utils';
 	import { page } from '$app/stores';
@@ -12,7 +20,6 @@
 	import Modal from '../../../components/Modal.svelte';
 	import flatpickr from 'flatpickr';
 	import 'flatpickr/dist/flatpickr.css';
-
 
 	let classId: number;
 	let classInfo: ClassInfoResponse | null = null;
@@ -27,6 +34,10 @@
 	let showModal = false;
 	let datepicker: HTMLInputElement | null = null;
 	let dateError: string | null = null;
+	let submissions: { [key: number]: Solution[] } = {};
+	let currentSubmissionIndex: number | null = null;
+	let currentSubmission: Solution | null = null;
+	let currentStudentName: string | null = null;
 
 	onMount(async () => {
 		const urlParams = get(page).params;
@@ -49,7 +60,7 @@
 			students = await getClassStudents(classId);
 			problems = await getAllProblems();
 			console.log('Class info:', classInfo);
-		} catch (err) {
+		} catch (err: any) {
 			error = err.message;
 			console.error(err);
 		}
@@ -93,8 +104,7 @@
 		return format(new Date(dateString), 'MMMM d, yyyy h:mm a');
 	};
 
-	const handleCreateHomework = async () =>
-	{
+	const handleCreateHomework = async () => {
 		if (!selectedProblemId || !selectedDueDate) return;
 
 		const now = new Date();
@@ -121,18 +131,48 @@
 		} catch (err) {
 			console.error('Failed to create homework:', err);
 		}
-	}
-;
+	};
 
 	const handleDeleteHomework = async (homeworkId: number) => {
 		try {
 			await deleteHomework(homeworkId);
 			homeworks = homeworks.filter(hw => hw.id !== homeworkId);
+			delete submissions[homeworkId];
 		} catch (err) {
 			console.error('Failed to delete homework:', err);
 		}
 	};
+
+	const fetchSubmissions = async (homeworkId: number) => {
+		try {
+			submissions[homeworkId] = await getHomeworkSubmissions(homeworkId);
+		} catch (err) {
+			console.error('Failed to load submissions:', err);
+		}
+	};
+
+	const showSubmission = async (homeworkId: number, index: number) => {
+		if (submissions[homeworkId] && submissions[homeworkId][index]) {
+			currentSubmissionIndex = index;
+			currentSubmission = submissions[homeworkId][index];
+			const profile = await getProfile(currentSubmission.user_id);
+			currentStudentName = `${profile.first_name} ${profile.last_name}`;
+		}
+	};
+
+	const nextSubmission = async (homeworkId: number) => {
+		if (currentSubmissionIndex !== null && currentSubmissionIndex < submissions[homeworkId].length - 1) {
+			await showSubmission(homeworkId, currentSubmissionIndex + 1);
+		}
+	};
+
+	const previousSubmission = async (homeworkId: number) => {
+		if (currentSubmissionIndex !== null && currentSubmissionIndex > 0) {
+			await showSubmission(homeworkId, currentSubmissionIndex - 1);
+		}
+	};
 </script>
+
 <template>
 	<div class="min-h-screen flex flex-col items-center justify-center bg-gray-100 py-12">
 		<div class="bg-white p-10 rounded-lg shadow-lg w-full max-w-2xl relative">
@@ -172,6 +212,40 @@
 									<button on:click={() => handleDeleteHomework(homework.id)}
 											class="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 mt-2">
 										Delete
+									</button>
+								{/if}
+								{#if submissions[homework.id]}
+									<div class="mt-4">
+										<h3 class="text-lg font-semibold">Submissions</h3>
+										<button on:click={() => showSubmission(homework.id, 0)}
+												class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2">
+											View Submissions
+										</button>
+										{#if currentSubmission}
+											<div class="mt-4">
+												<p><strong>Student:</strong> {currentStudentName}</p>
+												<p><strong>Code:</strong></p>
+												<pre class="bg-gray-200 p-2 rounded">{currentSubmission.code}</pre>
+												<p><strong>Language ID:</strong> {currentSubmission.language_id}</p>
+												<p><strong>Percentage Passed:</strong> {currentSubmission.percentage_passed}%</p>
+												<p><strong>Submitted At:</strong> {formatDate(currentSubmission.created_at)}</p>
+												<div class="flex justify-between mt-4">
+													<button on:click={() => previousSubmission(homework.id)}
+															class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+														Previous
+													</button>
+													<button on:click={() => nextSubmission(homework.id)}
+															class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+														Next
+													</button>
+												</div>
+											</div>
+										{/if}
+									</div>
+								{:else}
+									<button on:click={() => fetchSubmissions(homework.id)}
+											class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 mt-2">
+										View Submissions
 									</button>
 								{/if}
 							</li>

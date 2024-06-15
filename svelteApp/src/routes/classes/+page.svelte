@@ -60,10 +60,6 @@
 			classesPaginationSettings.size = userClasses.length;
 			classesPaginationSettings.amounts = [1, 2, 3, 5, 10, userClasses.length];
 			classesPaginationSettings.amounts = classesPaginationSettings.amounts.filter((item, index) => classesPaginationSettings.amounts.indexOf(item) === index);
-			console.log(userClasses);
-			console.log(userClasses[0].name);
-			console.log('User role:', role);
-			console.log('User classes:', userClasses);
 		} catch (err) {
 			console.error(err);
 		}
@@ -76,13 +72,14 @@
 
 			const payload: JoinClassPayload = { join_code: joinCode };
 			const classResponse = await joinClass(payload);
+			console.log(classResponse);
 			alert(`Joined class: ${classResponse.name}`);
-			await goto(`/classes/${classResponse.id}`);
+			await goto(`/classes/${classResponse.class_id}`);
 		} catch (err: any) {
+			alert(err.message);
 			console.error(err);
 		}
 	};
-
 	const handleCreateClass = async () => {
 		try {
 			const className = prompt('Enter the class name:');
@@ -124,7 +121,7 @@
 		<div class="flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6">
 			<div class="max-w-screen-lg sm:w-1/2 flex flex-col items-center p-8 rounded-lg">
 				{#if role === 'teacher'}
-					<img src="teacher_desk.png" alt="Teacher Desk" class="mb-4 w-6/12">
+					<img src="teacher_desk.png" alt="Teacher Desk" class="mb-4">
 					<button on:click={handleCreateClass}
 							class="bg-indigo-500 text-white py-2 px-4 rounded hover:bg-indigo-600 flex items-center justify-center space-x-3">
 						<i class="fa fa-plus"></i> <span>Create a class</span>

@@ -35,16 +35,6 @@ def join_class(request, payload: JoinClassSchema):
     return 201, JoinClassResponseSchema(class_id=class_instance.id, name=class_instance.name)
 
 
-@classes_router.get('/{class_id}/submissions', auth=jwt_auth, response=List[SolutionSchema])
-def list_submissions(request, class_id: int):
-    user = request.user
-    class_instance = Class.objects.get(id=class_id)
-    if user.role == 'teacher' and class_instance.teacher == user:
-        submissions = Solution.objects.filter(problem__homeworks__class_instance_id=class_id)
-        return [SolutionSchema.from_orm(submission) for submission in submissions]
-    return 400, {"error": "Only the teacher of the class can view submissions"}
-
-
 @classes_router.get('/{class_id}', auth=jwt_auth, response={200: ClassSchema, 400: dict})
 def get_class_info(request, class_id: int):
     user = request.auth
