@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import CodeEditor from '../../../components/CodeEditor.svelte';
+	import type { CreateProblemPayload } from '$lib/problems_api';
 	import { createProblem, createTestCase } from '$lib/problems_api';
 	import { goto } from '$app/navigation';
 
@@ -13,7 +14,7 @@
 	let grade = 9;
 	let category = 'arrays';
 	let error = writable<string | null>(null);
-	let testCases = writable<{ stdin: string; expected_output: string }[]>([]);
+	let testCases = writable<{ stdin: string; expected_output: string }[]>([{ stdin: '', expected_output: '' }]);
 
 	const difficultyOptions = ['easy', 'medium', 'hard'];
 	const gradeOptions = [9, 10, 11, 12];
@@ -25,7 +26,7 @@
 	];
 
 	async function handleSubmit() {
-		const problem = {
+		const problem: CreateProblemPayload = {
 			title,
 			description,
 			difficulty,
@@ -33,7 +34,7 @@
 			example_output,
 			solution_code,
 			grade,
-			category,
+			category
 		};
 
 		try {
@@ -44,7 +45,8 @@
 				await createTestCase(problemId, testCase);
 			}
 
-			await goto(`/problems/${problemId}`);
+			alert('Problem created successfully. Now wait for the admin to approve it');
+			await goto(`/problems`);
 		} catch (err) {
 			error.set('Failed to create problem or test cases');
 			console.error('Failed to create problem or test cases:', err);
@@ -56,6 +58,10 @@
 	}
 
 	function removeTestCase(index: number) {
+		if ($testCases.length === 1) {
+			alert('You must have at least one test case');
+			return;
+		}
 		testCases.update(cases => cases.filter((_, i) => i !== index));
 	}
 </script>
@@ -76,7 +82,8 @@
 
 			<div>
 				<label class="block font-medium mb-1" for="description">Description</label>
-				<textarea id="description" bind:value={description} required class="w-full px-3 py-2 border rounded-md"></textarea>
+				<textarea id="description" bind:value={description} required
+						  class="w-full px-3 py-2 border rounded-md"></textarea>
 			</div>
 
 			<div>
@@ -101,19 +108,22 @@
 				<label class="block font-medium mb-1" for="category">Category</label>
 				<select id="category" bind:value={category} required class="w-full px-3 py-2 border rounded-md">
 					{#each categoryOptions as option}
-						<option value={option}>{option.replace('_', ' ').charAt(0).toUpperCase() + option.replace('_', ' ').slice(1)}</option>
+						<option
+							value={option}>{option.replace('_', ' ').charAt(0).toUpperCase() + option.replace('_', ' ').slice(1)}</option>
 					{/each}
 				</select>
 			</div>
 
 			<div>
 				<label class="block font-medium mb-1" for="example_input">Example Input</label>
-				<textarea id="example_input" bind:value={example_input} required class="w-full px-3 py-2 border rounded-md"></textarea>
+				<textarea id="example_input" bind:value={example_input} required
+						  class="w-full px-3 py-2 border rounded-md"></textarea>
 			</div>
 
 			<div>
 				<label class="block font-medium mb-1" for="example_output">Example Output</label>
-				<textarea id="example_output" bind:value={example_output} required class="w-full px-3 py-2 border rounded-md"></textarea>
+				<textarea id="example_output" bind:value={example_output} required
+						  class="w-full px-3 py-2 border rounded-md"></textarea>
 			</div>
 
 			<div class="mb-4">
@@ -126,14 +136,17 @@
 				{#each $testCases as testCase, index}
 					<div class="mb-4 p-4 border rounded-md">
 						<div class="mb-2">
-							<label class="block font-medium mb-1">Input</label>
-							<textarea bind:value={testCase.stdin} required class="w-full px-3 py-2 border rounded-md"></textarea>
+							<label class="block font-medium mb-1" for="example_input">Input</label>
+							<textarea id="example_input" bind:value={testCase.stdin} required
+									  class="w-full px-3 py-2 border rounded-md"></textarea>
 						</div>
 						<div>
-							<label class="block font-medium mb-1">Expected Output</label>
-							<textarea bind:value={testCase.expected_output} required class="w-full px-3 py-2 border rounded-md"></textarea>
+							<label class="block font-medium mb-1" for="example_output">Expected Output</label>
+							<textarea id="example_output" bind:value={testCase.expected_output} required
+									  class="w-full px-3 py-2 border rounded-md"></textarea>
 						</div>
-						<button type="button" class="text-red-500 mt-2" on:click={() => removeTestCase(index)}>Remove</button>
+						<button type="button" class="text-red-500 mt-2" on:click={() => removeTestCase(index)}>Remove
+						</button>
 					</div>
 				{/each}
 				<button type="button" class="btn btn-secondary" on:click={addTestCase}>Add Test Case</button>
@@ -144,32 +157,28 @@
 	</div>
 </main>
 
-<style>
-	.btn {
-		@apply px-4 py-2 rounded-lg;
-	}
+<style lang="postcss">
+    .btn {
+        @apply px-4 py-2 rounded-lg;
+    }
 
-	.btn-primary {
-		@apply bg-blue-500 text-white;
-	}
+    .btn-primary {
+        @apply bg-blue-500 text-white;
+    }
 
-	.btn-secondary {
-		@apply bg-gray-500 text-white;
-	}
+    .btn-secondary {
+        @apply bg-gray-500 text-white;
+    }
 
-	.error {
-		color: red;
-	}
+    main {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 
-	main {
-		padding-left: 1rem;
-		padding-right: 1rem;
-	}
-
-	@media (min-width: 1024px) {
-		main {
-			padding-left: 2rem;
-			padding-right: 2rem;
-		}
-	}
+    @media (min-width: 1024px) {
+        main {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+    }
 </style>

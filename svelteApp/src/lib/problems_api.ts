@@ -10,6 +10,7 @@ export interface ProblemSchema {
 	difficulty: string;
 	example_input: string;
 	example_output: string;
+	solution_code: string;
 	created_at: string;
 	updated_at: string;
 	created_by: string;
@@ -18,13 +19,24 @@ export interface ProblemSchema {
 }
 
 export interface TestCase {
-    id: number;
-    problem_id: number;
-    stdin: string;
-    expected_output: string;
-    actualOutput?: string;
-    status?: string;
-    passed?: boolean;
+	id: number;
+	problem_id: number;
+	stdin: string;
+	expected_output: string;
+	actualOutput?: string;
+	status?: string;
+	passed?: boolean;
+}
+
+export interface CreateProblemPayload {
+	title: string;
+	description: string;
+	difficulty: string;
+	example_input: string;
+	example_output: string;
+	solution_code: string;
+	grade: number;
+	category: string;
 }
 
 export const getAllProblems = async (): Promise<ProblemSchema[]> => {
@@ -55,7 +67,7 @@ export const getProblemById = async (problemId: number): Promise<ProblemSchema> 
 	}
 };
 
-export const createProblem = async (problem: ProblemSchema): Promise<ProblemSchema> => {
+export const createProblem = async (problem: CreateProblemPayload): Promise<ProblemSchema> => {
 	try {
 		const response = await axios.post<ProblemSchema>(`${API_PROBLEMS_URL}/`, problem, getAuthHeaders());
 		return response.data;
@@ -69,7 +81,10 @@ export const createProblem = async (problem: ProblemSchema): Promise<ProblemSche
 	}
 };
 
-export const createTestCase = async (problemId: number, testCase: { stdin: string; expected_output: string }): Promise<TestCase> => {
+export const createTestCase = async (problemId: number, testCase: {
+	stdin: string;
+	expected_output: string
+}): Promise<TestCase> => {
 	try {
 		const response = await axios.post<TestCase>(`${API_PROBLEMS_URL}/${problemId}/test_cases/`, testCase, getAuthHeaders());
 		return response.data;
