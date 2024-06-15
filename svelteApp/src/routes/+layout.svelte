@@ -124,7 +124,8 @@
     .content-wrapper {
         display: flex;
         flex-direction: column;
-        min-height: 100vh;
+        height: fit-content;
+
     }
 
     .main-content {
@@ -196,37 +197,37 @@
 				<li class="relative mb-2">
 					<a href="/posts" on:click={() => updateCurrentPage('/posts')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/posts' ? 'active-page' : ''}`}>
-						<i class="fas fa-blog mr-2"></i> Posts
+						<i class="fas fa-blog mr-2 w-8"></i> Posts
 					</a>
 				</li>
 				<li class="relative mb-2">
 					<a href="/problems" on:click={() => updateCurrentPage('/problems')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/problems' ? 'active-page' : ''}`}>
-						<i class="fas fa-tasks mr-2"></i> Problems
+						<i class="fas fa-tasks mr-2 w-8"></i> Problems
 					</a>
 				</li>
 				<li class="relative mb-2">
 					<a href="/compiler" on:click={() => updateCurrentPage('/compiler')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/compiler' ? 'active-page' : ''}`}>
-						<i class="fas fa-code mr-2"></i> Compiler
+						<i class="fas fa-code mr-2 w-8"></i> Compiler
 					</a>
 				</li>
 				<li class="relative mb-2">
 					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
-						<i class="fas fa-user mr-2"></i> Profile
+						<i class="fas fa-user mr-2 w-8"></i> Profile
 					</a>
 				</li>
 				<li class="relative mb-2">
 					<a href="/classes" on:click={() => updateCurrentPage('/classes')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/classes' ? 'active-page' : ''}`}>
-						<i class="fas fa-users mr-2"></i> Classes
+						<i class="fas fa-users mr-2 w-8"></i> Classes
 					</a>
 				</li>
 				<li class="relative mb-2">
 					<a href="/" on:click={logout}
 					   class="nav-link block rounded-md px-4 py-2">
-						<i class="fas fa-sign-out-alt mr-2"></i> Logout
+						<i class="fas fa-sign-out-alt mr-2 w-8"></i> Logout
 					</a>
 				</li>
 			</ul>
