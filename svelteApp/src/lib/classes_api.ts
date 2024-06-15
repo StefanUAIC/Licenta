@@ -7,6 +7,7 @@ const API_CLASSES_URL = import.meta.env.VITE_API_CLASSES_URL;
 
 export interface CreateClassPayload {
 	name: string;
+	tag: string;
 }
 
 export interface JoinClassPayload {
@@ -16,6 +17,7 @@ export interface JoinClassPayload {
 export interface ClassResponse {
 	id: number;
 	name: string;
+	tag: string;
 	teacher_id: number;
 }
 

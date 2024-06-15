@@ -19,7 +19,7 @@ def create_class(request, payload: CreateClassSchema):
     user = request.user
     if user.role != 'teacher':
         return 400, {"error": "Only teachers can create classes"}
-    class_instance = Class.objects.create(name=payload.name, teacher=user)
+    class_instance = Class.objects.create(name=payload.name, tag=payload.tag, teacher=user)
     return 201, ClassSchema.from_orm(class_instance)
 
 

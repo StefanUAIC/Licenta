@@ -137,5 +137,6 @@ def list_classes(request, user_id: int):
         classes = Class.objects.filter(teacher=user)
     else:
         classes = Class.objects.filter(memberships__student=user)
-    return [ClassResponseSchema(id=class_instance.id, name=class_instance.name, teacher_id=class_instance.teacher_id)
+    return [ClassResponseSchema(id=class_instance.id, name=class_instance.name, teacher_id=class_instance.teacher_id,
+                                tag=class_instance.tag)
             for class_instance in classes]
