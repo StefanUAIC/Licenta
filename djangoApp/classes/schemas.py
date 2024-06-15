@@ -7,6 +7,7 @@ from pydantic import BaseModel, field_validator
 
 class ClassSchema(Schema):
     id: int
+    tag: str
     name: str
     teacher_id: int
     created_at: str
@@ -33,6 +34,7 @@ class MembershipSchema(Schema):
 
 class CreateClassSchema(Schema):
     name: str
+    tag: str
 
 
 class JoinClassSchema(Schema):
@@ -47,6 +49,7 @@ class JoinClassResponseSchema(Schema):
 class ClassResponseSchema(Schema):
     id: int
     name: str
+    tag: str
     teacher_id: int
 
 
