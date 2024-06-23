@@ -7,11 +7,13 @@
 	import { writable } from 'svelte/store';
 	import { fetchNotifications } from '$lib/notifications_api';
 	import { onMount } from 'svelte';
+	import ReportIssueModal from '../components/ReportIssueModal.svelte';
 
 	let sidebarVisible = false;
 	let currentPage = '';
 	let isNotificationsModalOpen = writable(false);
 	let hasUnreadNotifications = writable(false);
+	let isReportIssueModalOpen = writable(false);
 
 	function toggleSidebar() {
 		sidebarVisible = !sidebarVisible;
@@ -22,6 +24,10 @@
 		if ($isNotificationsModalOpen) {
 			hasUnreadNotifications.set(false);
 		}
+	}
+
+	function toggleReportIssueModal() {
+		isReportIssueModalOpen.update(open => !open);
 	}
 
 	$: currentPage = $page.url.pathname;
@@ -166,7 +172,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-		margin-bottom: 2rem;
+        margin-bottom: 2rem;
     }
 
     .app-logo img {
@@ -207,7 +213,8 @@
 			class="list-nav fixed top-0 left-0 w-56 h-full color-nav z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
 			<div class="app-logo">
 				<img src="/logo.png" alt="Logo">
-				<h1 class="bg-white text-blue-500 rounded-tr-lg rounded-bl-lg px-4 py-2 text-2xl font-semibold">CodeLegends</h1>
+				<h1 class="bg-white text-blue-500 rounded-tr-lg rounded-bl-lg px-4 py-2 text-2xl font-semibold">
+					CodeLegends</h1>
 			</div>
 			<ul>
 				<li class="relative mb-2">
@@ -242,6 +249,13 @@
 					</a>
 				</li>
 				<li class="relative mb-2">
+					<button on:click={toggleReportIssueModal}
+							class="nav-link block rounded-md px-4 py-2 text-left w-full">
+						<i class="fas fa-exclamation-circle mr-2 w-8"></i> Report an Issue
+					</button>
+				</li>
+				<div class="separator"></div>
+				<li class="relative mb-2">
 					<a href="/" on:click={logout}
 					   class="nav-link block rounded-md px-4 py-2">
 						<i class="fas fa-sign-out-alt mr-2 w-8"></i> Logout
@@ -253,6 +267,9 @@
 
 	<NotificationsModal bind:isOpen={$isNotificationsModalOpen} {hasUnreadNotifications}
 						onClose={() => isNotificationsModalOpen.set(false)} />
+
+	<ReportIssueModal bind:isOpen={$isReportIssueModalOpen} onClose={() => isReportIssueModalOpen.set(false)} />
+
 
 	<div class="flex flex-col bg-gray-100 h-screen">
 		<main class="main-content">

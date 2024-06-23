@@ -53,6 +53,7 @@ INSTALLED_APPS += [
 INSTALLED_APPS += [
     'users',
     'posts',
+    'issues',
     'classes',
     'problems',
     'homeworks',
