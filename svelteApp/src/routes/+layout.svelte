@@ -117,7 +117,7 @@
     .nav-link {
         color: white;
         padding: 1rem;
-        font-size: 1.3rem;
+        font-size: 1.4rem;
         display: flex;
         align-items: center;
     }
@@ -172,7 +172,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-bottom: 2rem;
+        margin-bottom: 2.5rem;
+        margin-top: 1rem;
     }
 
     .app-logo img {
@@ -182,9 +183,9 @@
     }
 
     .separator {
-        height: 2px;
+        height: 0.2rem;
         background-color: rgba(255, 255, 255, 0.5);
-        margin: 1rem 0;
+        margin: auto;
     }
 </style>
 
@@ -217,45 +218,45 @@
 					CodeLegends</h1>
 			</div>
 			<ul>
-				<li class="relative mb-2">
+				<li class="relative">
 					<a href="/posts" on:click={() => updateCurrentPage('/posts')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/posts' ? 'active-page' : ''}`}>
 						<i class="fas fa-blog mr-2 w-8"></i> Posts
 					</a>
 				</li>
-				<li class="relative mb-2">
+				<li class="relative">
 					<a href="/problems" on:click={() => updateCurrentPage('/problems')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/problems' ? 'active-page' : ''}`}>
 						<i class="fas fa-tasks mr-2 w-8"></i> Problems
 					</a>
 				</li>
-				<li class="relative mb-2">
+				<li class="relative">
 					<a href="/compiler" on:click={() => updateCurrentPage('/compiler')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/compiler' ? 'active-page' : ''}`}>
 						<i class="fas fa-code mr-2 w-8"></i> Compiler
 					</a>
 				</li>
-				<li class="relative mb-2">
+				<li class="relative">
 					<a href="/classes" on:click={() => updateCurrentPage('/classes')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/classes' ? 'active-page' : ''}`}>
 						<i class="fas fa-users mr-2 w-8"></i> Classes
 					</a>
 				</li>
 				<div class="separator"></div>
-				<li class="relative mb-2">
+				<li class="relative">
 					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
 						<i class="fas fa-user mr-2 w-8"></i> Profile
 					</a>
 				</li>
-				<li class="relative mb-2">
+				<li class="relative">
 					<button on:click={toggleReportIssueModal}
-							class="nav-link block rounded-md px-4 py-2 text-left w-full">
-						<i class="fas fa-exclamation-circle mr-2 w-8"></i> Report an Issue
+							class="nav-link block rounded-md px-4 py-2 text-left">
+						<i class="fas fa-exclamation-circle mr-1 w-11"></i> Report an Issue
 					</button>
 				</li>
 				<div class="separator"></div>
-				<li class="relative mb-2">
+				<li class="relative">
 					<a href="/" on:click={logout}
 					   class="nav-link block rounded-md px-4 py-2">
 						<i class="fas fa-sign-out-alt mr-2 w-8"></i> Logout
