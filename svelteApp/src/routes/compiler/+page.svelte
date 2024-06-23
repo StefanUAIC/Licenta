@@ -73,7 +73,7 @@ int main()
 	}
 </script>
 
-<main class="p-8 bg-gray-100 min-h-screen">
+<main class="p-8 bg-gray-100 h-full">
 	<div class="container mx-auto">
 		<h1 class="text-3xl font-bold mb-4">Judge0 Code Submission</h1>
 		<AceEditor bind:code={source_code} />

@@ -4,7 +4,7 @@
 </script>
 
 <footer
-	class="bg-zinc-50 text-center text-surface/75 dark:bg-neutral-700 dark:text-white/75 lg:text-left ">
+	class="bg-zinc-50 text-center text-surface/75 dark:bg-neutral-700 dark:text-white/75 lg:text-left flex-constant">
 
 	<div class="bg-black/5 p-3 text-center">
 		<span>© 2024:</span>

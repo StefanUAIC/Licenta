@@ -117,7 +117,7 @@
 </script>
 
 <template>
-	<div class="min-h-screen flex flex-col items-center justify-center py-6">
+	<div class="h-full flex flex-col items-center justify-center py-6">
 		<div class="flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6">
 			<div class="max-w-screen-lg sm:w-1/2 flex flex-col items-center p-8 rounded-lg">
 				{#if role === 'teacher'}

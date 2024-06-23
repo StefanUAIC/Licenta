@@ -153,7 +153,7 @@
 	};
 </script>
 
-<main class="flex items-center justify-center min-h-screen bg-gray-100">
+<main class="flex justify-center items-center h-full bg-gray-100">
 	<div class="w-full max-w-md p-8 space-y-4 bg-white rounded-lg shadow-md">
 		<h1 class="text-2xl font-bold text-center">Register</h1>
 		{#if errors.length > 0}

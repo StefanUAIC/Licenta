@@ -57,7 +57,6 @@
 		"postcss-load-config": "^5.1.0",
 		"svelte-fa": "^4.0.2",
 		"svelte-icons": "^2.1.0",
-		"svelte-materialify": "^0.3.11",
 		"svelte-preprocess": "^5.1.4"
 	}
 }

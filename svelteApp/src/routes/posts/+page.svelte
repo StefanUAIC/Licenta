@@ -6,21 +6,15 @@
 
 <style>
     .waves-container {
-        position: relative;
-        width: 100%;
         background-color: #4f46e5;
     }
 
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-    }
 </style>
 
 <AppShell>
-	<div class="waves-container">
+	<div class="waves-container h-full">
 		<Waves_2 />
-		<div class="container mx-auto pb-8">
+		<div class="container mx-auto pb-8 ">
 			<h2 class="text-3xl font-bold mb-12 text-white">Users posts</h2>
 			<UserPosts />
 		</div>

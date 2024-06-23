@@ -121,13 +121,6 @@
         color: rgb(255, 255, 255) !important;
     }
 
-    .content-wrapper {
-        display: flex;
-        flex-direction: column;
-        height: fit-content;
-
-    }
-
     .main-content {
         flex: 1;
     }
@@ -168,6 +161,25 @@
     .color-nav {
         background-color: #009fff !important;
     }
+
+    .app-logo {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+		margin-bottom: 2rem;
+    }
+
+    .app-logo img {
+        width: 10rem;
+        height: 10rem;
+        margin-bottom: 1rem;
+    }
+
+    .separator {
+        height: 2px;
+        background-color: rgba(255, 255, 255, 0.5);
+        margin: 1rem 0;
+    }
 </style>
 
 <AppShell slotSidebarLeft="w-56 p-4">
@@ -193,6 +205,10 @@
 
 		<nav
 			class="list-nav fixed top-0 left-0 w-56 h-full color-nav z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
+			<div class="app-logo">
+				<img src="/logo.png" alt="Logo">
+				<h1 class="bg-white text-blue-500 rounded-tr-lg rounded-bl-lg px-4 py-2 text-2xl font-semibold">CodeLegends</h1>
+			</div>
 			<ul>
 				<li class="relative mb-2">
 					<a href="/posts" on:click={() => updateCurrentPage('/posts')}
@@ -213,15 +229,16 @@
 					</a>
 				</li>
 				<li class="relative mb-2">
-					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
-					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
-						<i class="fas fa-user mr-2 w-8"></i> Profile
-					</a>
-				</li>
-				<li class="relative mb-2">
 					<a href="/classes" on:click={() => updateCurrentPage('/classes')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/classes' ? 'active-page' : ''}`}>
 						<i class="fas fa-users mr-2 w-8"></i> Classes
+					</a>
+				</li>
+				<div class="separator"></div>
+				<li class="relative mb-2">
+					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
+						<i class="fas fa-user mr-2 w-8"></i> Profile
 					</a>
 				</li>
 				<li class="relative mb-2">
@@ -237,10 +254,11 @@
 	<NotificationsModal bind:isOpen={$isNotificationsModalOpen} {hasUnreadNotifications}
 						onClose={() => isNotificationsModalOpen.set(false)} />
 
-	<div class="content-wrapper">
+	<div class="flex flex-col bg-gray-100 h-screen">
 		<main class="main-content">
 			<slot />
 		</main>
 		<Footer />
 	</div>
+
 </AppShell>
