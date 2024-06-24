@@ -37,13 +37,14 @@ def submit_and_test_code(source_code, language_id, test_cases, memory_limit, tim
             if status_id in [1, 2]:
                 continue
 
-        memory_exceeded = result_data.get("memory", 0) > memory_limit * 1024 * 1024
+        memory_exceeded = result_data.get("memory", 0) > memory_limit
         time_exceeded = result_data.get("time", 0) > time_limit
-        passed = result_data.get("stdout", "").strip() == test_case.expected_output.strip() and not (
-                    memory_exceeded or time_exceeded)
+        passed = (result_data.get("stdout", "").strip() == test_case.expected_output.strip()
+                  and not (memory_exceeded or time_exceeded))
 
         if passed:
             passed_count += 1
+
         results.append({
             "test_case_id": test_case.id,
             "input": test_case.stdin,
