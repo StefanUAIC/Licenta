@@ -221,32 +221,32 @@
 				<li class="relative">
 					<a href="/posts" on:click={() => updateCurrentPage('/posts')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/posts' ? 'active-page' : ''}`}>
-						<i class="fas fa-blog mr-2 w-8"></i> Posts
+						<i class="fas fa-blog mr-2 w-8"></i> Postări
 					</a>
 				</li>
 				<li class="relative">
 					<a href="/problems" on:click={() => updateCurrentPage('/problems')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/problems' ? 'active-page' : ''}`}>
-						<i class="fas fa-tasks mr-2 w-8"></i> Problems
+						<i class="fas fa-tasks mr-2 w-8"></i> Probleme
 					</a>
 				</li>
 				<li class="relative">
-					<a href="/compiler" on:click={() => updateCurrentPage('/compiler')}
-					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/compiler' ? 'active-page' : ''}`}>
-						<i class="fas fa-code mr-2 w-8"></i> Compiler
+					<a href="/leaderboards" on:click={() => updateCurrentPage('/leaderboards')}
+					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/leaderboards' ? 'active-page' : ''}`}>
+						<i class="fas fa-trophy mr-2 w-8"></i> Clasament
 					</a>
 				</li>
 				<li class="relative">
 					<a href="/classes" on:click={() => updateCurrentPage('/classes')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/classes' ? 'active-page' : ''}`}>
-						<i class="fas fa-users mr-2 w-8"></i> Classes
+						<i class="fas fa-users mr-2 w-8"></i> Clasele tale
 					</a>
 				</li>
 				<div class="separator"></div>
 				<li class="relative">
 					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
-						<i class="fas fa-user mr-2 w-8"></i> Profile
+						<i class="fas fa-user mr-2 w-8"></i> Profil
 					</a>
 				</li>
 				<li class="relative">
@@ -259,7 +259,7 @@
 				<li class="relative">
 					<a href="/" on:click={logout}
 					   class="nav-link block rounded-md px-4 py-2">
-						<i class="fas fa-sign-out-alt mr-2 w-8"></i> Logout
+						<i class="fas fa-sign-out-alt mr-2 w-8"></i> Delogare
 					</a>
 				</li>
 			</ul>

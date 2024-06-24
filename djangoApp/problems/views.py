@@ -34,7 +34,8 @@ def create_problem(request, payload: CreateProblemSchema):
         grade=payload.grade,
         category=payload.category,
         memory_limit=payload.memory_limit,
-        time_limit=payload.time_limit
+        time_limit=payload.time_limit,
+        restrictions=payload.restrictions
     )
     return 201, ProblemSchema.from_orm(problem)
 
@@ -57,9 +58,3 @@ def create_test_case(request, problem_id: int, payload: CreateTestCaseSchema):
         expected_output=payload.expected_output
     )
     return 201, TestCaseSchema.from_orm(test_case)
-
-
-@problems_router.get('/{problem_id}/test_cases/', response=List[TestCaseSchema])
-def list_test_cases(request, problem_id: int):
-    test_cases = TestCase.objects.filter(problem_id=problem_id)
-    return [TestCaseSchema.from_orm(test_case) for test_case in test_cases]

@@ -16,6 +16,9 @@ export interface ProblemSchema {
 	created_by: string;
 	grade: number;
 	category: string;
+	memory_limit: number;
+	time_limit: number;
+	restrictions: string;
 }
 
 export interface TestCase {
@@ -39,6 +42,7 @@ export interface CreateProblemPayload {
 	category: string;
 	memory_limit: number;
 	time_limit: number;
+	restrictions: string;
 }
 
 export const getAllProblems = async (): Promise<ProblemSchema[]> => {
@@ -89,20 +93,6 @@ export const createTestCase = async (problemId: number, testCase: {
 }): Promise<TestCase> => {
 	try {
 		const response = await axios.post<TestCase>(`${API_PROBLEMS_URL}/${problemId}/test_cases/`, testCase, getAuthHeaders());
-		return response.data;
-	} catch (error) {
-		if (axios.isAxiosError(error) && error.response) {
-			console.log(error.response.data.errors);
-			throw error.response.data.errors;
-		} else {
-			throw new Error('An unexpected error occurred');
-		}
-	}
-};
-
-export const getTestCasesByProblemId = async (problemId: number): Promise<TestCase[]> => {
-	try {
-		const response = await axios.get<TestCase[]>(`${API_PROBLEMS_URL}/${problemId}/test_cases`, getAuthHeaders());
 		return response.data;
 	} catch (error) {
 		if (axios.isAxiosError(error) && error.response) {

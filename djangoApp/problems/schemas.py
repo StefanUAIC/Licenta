@@ -22,6 +22,7 @@ class ProblemSchema(Schema):
     status: str
     memory_limit: int
     time_limit: int
+    restrictions: str
 
     @field_validator('created_at', 'updated_at', mode='before')
     def format_datetime(cls, value: datetime) -> str:
@@ -47,6 +48,7 @@ class CreateProblemSchema(Schema):
     category: str
     memory_limit: int
     time_limit: int
+    restrictions: str
 
     @field_validator('difficulty')
     def validate_difficulty(cls, value):

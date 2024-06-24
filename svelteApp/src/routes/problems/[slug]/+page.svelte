@@ -95,7 +95,6 @@
 			loading.set(false);
 		}
 	}
-
 </script>
 
 <main class="min-h-screen bg-gray-100 py-10">
@@ -116,6 +115,9 @@
 					<p><strong>Difficulty:</strong> {$problem.difficulty}</p>
 					<p><strong>Grade:</strong> {$problem.grade}</p>
 					<p><strong>Category:</strong> {$problem.category}</p>
+					<p><strong>Memory Limit:</strong> {$problem.memory_limit} MB</p>
+					<p><strong>Time Limit:</strong> {$problem.time_limit} seconds</p>
+					<p><strong>Restrictions:</strong> {$problem.restrictions}</p>
 				</div>
 				<div class="mb-4">
 					<h2 class="text-xl font-semibold mb-2">Example Input</h2>
@@ -133,7 +135,7 @@
 				<div class="mb-4">
 					<label for="language" class="block text-lg font-medium text-gray-700 mb-2">Select Language</label>
 					<select id="language" class="block w-full p-2 border border-gray-300 rounded-lg"
-							bind:value={$language_id}>
+									bind:value={$language_id}>
 						{#each $languages as language}
 							<option value={language.id}>{language.name}</option>
 						{/each}
@@ -143,7 +145,7 @@
 				<div class="mb-4">
 					<label for="homework" class="block text-lg font-medium text-gray-700 mb-2">Select Homework</label>
 					<select id="homework" class="block w-full p-2 border border-gray-300 rounded-lg"
-							bind:value={$selectedHomeworkId}>
+									bind:value={$selectedHomeworkId}>
 						<option value={null}>None</option>
 						{#each $homeworks as homework}
 							<option value={homework.id}>{homework.problem_title}

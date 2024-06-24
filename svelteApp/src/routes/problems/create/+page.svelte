@@ -17,6 +17,7 @@
 	let testCases = writable<{ stdin: string; expected_output: string }[]>([{ stdin: '', expected_output: '' }]);
 	let memory_limit = 256;
 	let time_limit = 1;
+	let restrictions = '';
 
 	const difficultyOptions = ['easy', 'medium', 'hard'];
 	const gradeOptions = [9, 10, 11, 12];
@@ -38,7 +39,8 @@
 			grade,
 			category,
 			memory_limit,
-			time_limit
+			time_limit,
+			restrictions
 		};
 
 		try {
@@ -89,7 +91,11 @@
 				<textarea id="description" bind:value={description} required
 									class="w-full px-3 py-2 border rounded-md"></textarea>
 			</div>
-
+			<div>
+				<label class="block font-medium mb-1" for="restrictions">Restrictions</label>
+				<textarea id="restrictions" bind:value={restrictions} required
+									class="w-full px-3 py-2 border rounded-md" />
+			</div>
 			<div>
 				<label class="block font-medium mb-1" for="difficulty">Difficulty</label>
 				<select id="difficulty" bind:value={difficulty} required class="w-full px-3 py-2 border rounded-md">
