@@ -52,12 +52,12 @@
 		<div class="container mx-auto pt-8">
 			<div class="flex flex-col md:flex-row items-center justify-between">
 				<div class="md:w-2/3 text-center">
-					<h1 class="text-5xl font-bold mb-8 text-indigo-600">Welcome to my website</h1>
-					<p class="text-2xl mb-12 text-gray-600">Go and look around, you'll find cool stuff</p>
+					<h1 class="text-5xl font-bold mb-8 text-indigo-600">Bun venit pe platforma CodeLegends</h1>
+					<p class="text-2xl mb-12 text-gray-600">Înscrie-te pentru a rezolva probleme de programare</p>
 					<div class="flex flex-col md:flex-row justify-center space-y-4 md:space-x-8 md:space-y-0">
 						<a href="/register"
-						   class="bg-indigo-600 text-white px-14 py-6 rounded-lg hover:bg-indigo-700 text-lg">Register</a>
-						<a href="/login" class="bg-teal-500 text-white px-14 py-6 rounded-lg hover:bg-teal-600 text-lg">Login</a>
+						   class="bg-indigo-600 text-white px-14 py-6 rounded-lg hover:bg-indigo-700 text-lg">Înregistrare</a>
+						<a href="/login" class="bg-teal-500 text-white px-14 py-6 rounded-lg hover:bg-teal-600 text-lg">Logare</a>
 					</div>
 				</div>
 				<div class="imagine-container">
