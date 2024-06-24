@@ -1,11 +1,12 @@
 from typing import List
+
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from ninja import Router
+
+from users.authentication import jwt_auth
 from .models import Problem, TestCase
 from .schemas import ProblemSchema, CreateProblemSchema, TestCaseSchema, CreateTestCaseSchema
-from users.authentication import jwt_auth
-from notifications.models import Notification
 
 problems_router = Router(tags=["Problems"])
 User = get_user_model()
@@ -31,7 +32,9 @@ def create_problem(request, payload: CreateProblemSchema):
         solution_code=payload.solution_code,
         created_by=user,
         grade=payload.grade,
-        category=payload.category
+        category=payload.category,
+        memory_limit=payload.memory_limit,
+        time_limit=payload.time_limit
     )
     return 201, ProblemSchema.from_orm(problem)
 

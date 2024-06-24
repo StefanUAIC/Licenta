@@ -37,6 +37,8 @@ export interface CreateProblemPayload {
 	solution_code: string;
 	grade: number;
 	category: string;
+	memory_limit: number;
+	time_limit: number;
 }
 
 export const getAllProblems = async (): Promise<ProblemSchema[]> => {

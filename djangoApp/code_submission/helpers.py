@@ -8,7 +8,7 @@ load_dotenv()
 judge0_url = os.environ.get("JUDGE_URL").strip()
 
 
-def submit_and_test_code(source_code, language_id, test_cases):
+def submit_and_test_code(source_code, language_id, test_cases, memory_limit, time_limit):
     results = []
     passed_count = 0
 
@@ -18,7 +18,9 @@ def submit_and_test_code(source_code, language_id, test_cases):
         data = {
             "source_code": source_code,
             "language_id": language_id,
-            "stdin": test_case.stdin
+            "stdin": test_case.stdin,
+            "memory_limit": memory_limit,
+            "cpu_time_limit": time_limit
         }
         response = requests.post(api_url, json=data, headers=headers)
         token = response.json().get("token")
@@ -31,12 +33,15 @@ def submit_and_test_code(source_code, language_id, test_cases):
         while status_id in [1, 2]:
             result_response = requests.get(result_url, headers=headers)
             result_data = result_response.json()
-            print("result_data1111", result_data)
             status_id = result_data.get("status", {}).get("id")
             if status_id in [1, 2]:
                 continue
 
-        passed = result_data.get("stdout", "").strip() == test_case.expected_output.strip()
+        memory_exceeded = result_data.get("memory", 0) > memory_limit * 1024 * 1024
+        time_exceeded = result_data.get("time", 0) > time_limit
+        passed = result_data.get("stdout", "").strip() == test_case.expected_output.strip() and not (
+                    memory_exceeded or time_exceeded)
+
         if passed:
             passed_count += 1
         results.append({
@@ -46,6 +51,8 @@ def submit_and_test_code(source_code, language_id, test_cases):
             "actual_output": result_data.get("stdout", ""),
             "status": result_data.get("status", {}).get("description", ""),
             "passed": passed,
+            "memory_exceeded": memory_exceeded,
+            "time_exceeded": time_exceeded,
             "compile_output": result_data.get("compile_output", ""),
             "stderr": result_data.get("stderr", ""),
             "message": result_data.get("message", "")

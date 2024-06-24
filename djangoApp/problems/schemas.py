@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from ninja import Schema
 from pydantic import field_validator
@@ -19,6 +20,8 @@ class ProblemSchema(Schema):
     grade: int
     category: str
     status: str
+    memory_limit: int
+    time_limit: int
 
     @field_validator('created_at', 'updated_at', mode='before')
     def format_datetime(cls, value: datetime) -> str:
@@ -42,6 +45,8 @@ class CreateProblemSchema(Schema):
     solution_code: str
     grade: int
     category: str
+    memory_limit: int
+    time_limit: int
 
     @field_validator('difficulty')
     def validate_difficulty(cls, value):

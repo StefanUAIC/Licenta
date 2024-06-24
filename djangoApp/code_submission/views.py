@@ -22,13 +22,11 @@ judge0_url = os.environ.get("JUDGE_URL").strip()
 @code_submission_router.post("/submit_code", auth=jwt_auth, response={200: CodeSubmissionResultSchema, 400: dict})
 def submit_code(request, payload: CodeSubmissionSchema):
     try:
-        print(payload)
         problem = Problem.objects.get(id=payload.problem_id)
         test_cases = TestCase.objects.filter(problem=problem)
 
-        status, result_data = submit_and_test_code(payload.source_code, payload.language_id, test_cases)
-        print("result_data", result_data)
-        print("status", status)
+        status, result_data = submit_and_test_code(payload.source_code, payload.language_id, test_cases,
+                                                   problem.memory_limit, problem.time_limit)
         if status != 200:
             return status, result_data
 
@@ -41,10 +39,7 @@ def submit_code(request, payload: CodeSubmissionSchema):
         user = request.auth
         homework = None
         if payload.homework_id:
-            try:
-                homework = Homework.objects.get(id=payload.homework_id)
-            except Homework.DoesNotExist:
-                return 404, {"error": "Homework not found"}
+            homework = Homework.objects.get(id=payload.homework_id)
 
         create_solution(user, problem, payload.source_code, payload.language_id, percentage_passed, homework)
 
@@ -62,7 +57,8 @@ def test_code(request, payload: CodeSubmissionSchema):
         problem = Problem.objects.get(id=payload.problem_id)
         test_cases = TestCase.objects.filter(problem=problem)
 
-        status, result_data = submit_and_test_code(payload.source_code, payload.language_id, test_cases)
+        status, result_data = submit_and_test_code(payload.source_code, payload.language_id, test_cases,
+                                                   problem.memory_limit, problem.time_limit)
 
         return status, result_data
 

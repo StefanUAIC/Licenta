@@ -146,7 +146,7 @@
 						</tr>
 						</thead>
 						<tbody class="bg-transparent divide-y divide-gray-200 gap-y-px">
-						{#each classesBodySliced as classItem, index}
+						{#each classesBodySliced as classItem}
 							<tr>
 								<td class="w-16 pr-2">
 									<div

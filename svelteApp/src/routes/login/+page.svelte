@@ -49,6 +49,10 @@
 	const handleMouseDown = (event: MouseEvent) => {
 		event.preventDefault();
 	};
+
+	const handleRegister = () => {
+		goto('/register');
+	};
 </script>
 
 <main class="flex justify-center items-center h-full bg-gray-100">
@@ -93,5 +97,15 @@
 				Login
 			</button>
 		</form>
+		<div class="text-center">
+			<p class="text-sm text-gray-600">New to our platform?
+				<button
+					type="button"
+					on:click={handleRegister}
+					class="text-indigo-600 hover:underline">
+					Create an account
+				</button>
+			</p>
+		</div>
 	</div>
 </main>

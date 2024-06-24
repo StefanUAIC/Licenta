@@ -4,6 +4,8 @@
 	import type { ProblemSchema } from '$lib/problems_api';
 	import { getAllProblems } from '$lib/problems_api';
 	import { goto } from '$app/navigation';
+	import { getUserRole } from '$lib/users_api';
+	import { getCookie, getUserIDFromJWT } from '$lib/utils';
 
 	const search: Writable<string> = writable('');
 	const difficulty: Writable<string> = writable('');
@@ -12,6 +14,7 @@
 
 	const problems: Writable<ProblemSchema[]> = writable([]);
 	const error: Writable<string | null> = writable(null);
+	const userRole: Writable<'student' | 'teacher' | null> = writable(null);
 
 	const difficultyLabels: Record<string, string> = {
 		'easy': 'Easy',
@@ -57,13 +60,18 @@
 		}
 	};
 
-	onMount(() => {
-		fetchProblems();
+
+	onMount(async () => {
+		await fetchProblems();
+		let accessToken = getCookie('access');
+		const user_id = getUserIDFromJWT(accessToken);
+		const roleResponse = await getUserRole(user_id);
+		userRole.set(roleResponse.role);
 	});
 
 	const filteredProblems = derived(
 		[problems, search, difficulty, grade, category],
-		([$problems, $search, $difficulty, $grade, $category]) => {
+		() => {
 			if (!$problems) return [];
 			return $problems.filter(problem => {
 				return (
@@ -89,16 +97,16 @@
 		{/if}
 		<form on:submit|preventDefault class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
 			<input type="text" placeholder="Search" bind:value={$search}
-				   class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+						 class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
 			<select bind:value={$difficulty}
-					class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
 				<option value="">All Difficulties</option>
 				<option value="easy">Easy</option>
 				<option value="medium">Medium</option>
 				<option value="hard">Hard</option>
 			</select>
 			<select bind:value={$grade}
-					class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
 				<option value="">All Grades</option>
 				<option value="9">9th</option>
 				<option value="10">10th</option>
@@ -106,7 +114,7 @@
 				<option value="12">12th</option>
 			</select>
 			<select bind:value={$category}
-					class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
+							class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
 				<option value="">All Categories</option>
 				{#each Object.entries(categoryLabels) as [key, value]}
 					<option value={key}>{value}</option>
@@ -114,9 +122,11 @@
 			</select>
 		</form>
 
-		<div class="text-right mb-6">
-			<button on:click={handleCreateProblem} class="btn btn-primary">Create Problem</button>
-		</div>
+		{#if $userRole === 'teacher'}
+			<div class="text-right mb-6">
+				<button on:click={handleCreateProblem} class="btn btn-primary">Create Problem</button>
+			</div>
+		{/if}
 
 		<ul class="space-y-4">
 			{#each $filteredProblems as problem}
@@ -134,16 +144,12 @@
 	</div>
 </main>
 
-<style>
-	.btn {
-		@apply px-4 py-2 rounded-lg;
-	}
+<style lang="postcss">
+    .btn {
+        @apply px-4 py-2 rounded-lg;
+    }
 
-	.btn-primary {
-		@apply bg-blue-500 text-white;
-	}
-
-	.error {
-		color: red;
-	}
+    .btn-primary {
+        @apply bg-blue-500 text-white;
+    }
 </style>
