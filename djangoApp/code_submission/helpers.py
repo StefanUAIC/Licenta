@@ -13,16 +13,19 @@ def submit_and_test_code(source_code, language_id, test_cases, memory_limit, tim
     passed_count = 0
 
     for test_case in test_cases:
+        passed = False
         api_url = f"{judge0_url}/submissions?base64_encoded=false"
         headers = {"Content-Type": "application/json"}
         data = {
             "source_code": source_code,
             "language_id": language_id,
             "stdin": test_case.stdin,
-            "memory_limit": memory_limit,
-            "cpu_time_limit": time_limit
+            "cpu_time_limit": time_limit,
+            "cpu_extra_time": 1,
+            "wall_time_limit": time_limit * 10,
         }
         response = requests.post(api_url, json=data, headers=headers)
+        print(response.json())
         token = response.json().get("token")
 
         if not token:
@@ -37,10 +40,19 @@ def submit_and_test_code(source_code, language_id, test_cases, memory_limit, tim
             if status_id in [1, 2]:
                 continue
 
+        print(result_data)
         memory_exceeded = result_data.get("memory", 0) > memory_limit
-        time_exceeded = result_data.get("time", 0) > time_limit
+        time_exceeded = float(result_data.get("time", 0)) > time_limit
+
+        if result_data.get("stdout") is None:
+            result_data["stdout"] = ""
         passed = (result_data.get("stdout", "").strip() == test_case.expected_output.strip()
                   and not (memory_exceeded or time_exceeded))
+
+        if memory_exceeded:
+            result_data["status"]["description"] = "Memory Limit Exceeded"
+        elif time_exceeded:
+            result_data["status"]["description"] = "Time Limit Exceeded"
 
         if passed:
             passed_count += 1
