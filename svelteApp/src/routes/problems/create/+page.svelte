@@ -15,6 +15,9 @@
 	let category = 'arrays';
 	let error = writable<string | null>(null);
 	let testCases = writable<{ stdin: string; expected_output: string }[]>([{ stdin: '', expected_output: '' }]);
+	let memory_limit = 256;
+	let time_limit = 1;
+	let restrictions = '';
 
 	const difficultyOptions = ['easy', 'medium', 'hard'];
 	const gradeOptions = [9, 10, 11, 12];
@@ -34,7 +37,10 @@
 			example_output,
 			solution_code,
 			grade,
-			category
+			category,
+			memory_limit,
+			time_limit,
+			restrictions
 		};
 
 		try {
@@ -83,9 +89,13 @@
 			<div>
 				<label class="block font-medium mb-1" for="description">Description</label>
 				<textarea id="description" bind:value={description} required
-						  class="w-full px-3 py-2 border rounded-md"></textarea>
+									class="w-full px-3 py-2 border rounded-md"></textarea>
 			</div>
-
+			<div>
+				<label class="block font-medium mb-1" for="restrictions">Restrictions</label>
+				<textarea id="restrictions" bind:value={restrictions} required
+									class="w-full px-3 py-2 border rounded-md" />
+			</div>
 			<div>
 				<label class="block font-medium mb-1" for="difficulty">Difficulty</label>
 				<select id="difficulty" bind:value={difficulty} required class="w-full px-3 py-2 border rounded-md">
@@ -117,15 +127,25 @@
 			<div>
 				<label class="block font-medium mb-1" for="example_input">Example Input</label>
 				<textarea id="example_input" bind:value={example_input} required
-						  class="w-full px-3 py-2 border rounded-md"></textarea>
+									class="w-full px-3 py-2 border rounded-md"></textarea>
 			</div>
 
 			<div>
 				<label class="block font-medium mb-1" for="example_output">Example Output</label>
 				<textarea id="example_output" bind:value={example_output} required
-						  class="w-full px-3 py-2 border rounded-md"></textarea>
+									class="w-full px-3 py-2 border rounded-md"></textarea>
+			</div>
+			<div>
+				<label class="block font-medium mb-1" for="memory_limit">Memory Limit (KB)</label>
+				<input id="memory_limit" type="number" bind:value={memory_limit} required
+							 class="w-full px-3 py-2 border rounded-md" />
 			</div>
 
+			<div>
+				<label class="block font-medium mb-1" for="time_limit">Time Limit (seconds)</label>
+				<input id="time_limit" type="number" bind:value={time_limit} required
+							 class="w-full px-3 py-2 border rounded-md" />
+			</div>
 			<div class="mb-4">
 				<label class="block font-medium mb-1" for="solution_code">Solution Code</label>
 				<CodeEditor bind:code={solution_code} />
@@ -138,12 +158,12 @@
 						<div class="mb-2">
 							<label class="block font-medium mb-1" for="example_input">Input</label>
 							<textarea id="example_input" bind:value={testCase.stdin} required
-									  class="w-full px-3 py-2 border rounded-md"></textarea>
+												class="w-full px-3 py-2 border rounded-md"></textarea>
 						</div>
 						<div>
 							<label class="block font-medium mb-1" for="example_output">Expected Output</label>
 							<textarea id="example_output" bind:value={testCase.expected_output} required
-									  class="w-full px-3 py-2 border rounded-md"></textarea>
+												class="w-full px-3 py-2 border rounded-md"></textarea>
 						</div>
 						<button type="button" class="text-red-500 mt-2" on:click={() => removeTestCase(index)}>Remove
 						</button>
@@ -151,7 +171,6 @@
 				{/each}
 				<button type="button" class="btn btn-secondary" on:click={addTestCase}>Add Test Case</button>
 			</div>
-
 			<button type="submit" class="btn btn-primary">Create Problem</button>
 		</form>
 	</div>

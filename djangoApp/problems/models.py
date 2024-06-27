@@ -54,6 +54,9 @@ class Problem(models.Model):
     grade = models.IntegerField(choices=GRADES, default=9)
     category = models.CharField(choices=CATEGORIES, max_length=20, default='miscellaneous')
     status = models.CharField(choices=STATUS_CHOICES, max_length=10, default='PENDING')
+    memory_limit = models.IntegerField(default=256)
+    time_limit = models.IntegerField(default=1)
+    restrictions = models.TextField(default='')
 
     def __str__(self):
         return self.title

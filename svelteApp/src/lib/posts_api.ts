@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { getAuthHeaders, getCookie, getUserIDFromJWT } from './utils';
-import { getUserRole } from '$lib/users_api';
+import { getAuthHeaders } from './utils';
 
 const API_POSTS_URL = import.meta.env.VITE_API_POSTS_URL;
 
