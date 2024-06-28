@@ -54,3 +54,12 @@ export const getUserClasses = async (userId: number): Promise<ClassResponse[]> =
 		}
 	}
 };
+
+
+export const getStudentCount = () => {
+  return Math.floor(Math.random() * 4000) + 1000;
+}
+
+export const getTeacherCount = () => {
+  return Math.floor(Math.random() * 250) + 50;
+}

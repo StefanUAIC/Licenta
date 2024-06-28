@@ -190,7 +190,7 @@
 </style>
 
 <AppShell slotSidebarLeft="w-56 p-4">
-	{#if !['/', '/login', '/register'].includes(currentPage)}
+	{#if !['/', '/login', '/register', '/home'].includes(currentPage)}
 		<button class="hamburger" class:open={sidebarVisible} on:click={toggleSidebar}>
 			<svg width="2rem" height="1.5rem">
 				<line id="top" x1="0" y1="0.125rem" x2="2rem" y2="0.125rem" />
@@ -214,7 +214,7 @@
 			class="list-nav fixed top-0 left-0 w-56 h-full color-nav z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
 			<div class="app-logo">
 				<img src="/logo.png" alt="Logo">
-				<h1 class="bg-white text-blue-500 rounded-tr-lg rounded-bl-lg px-4 py-2 text-2xl font-semibold">
+				<h1 class="bg-white text-blue-500 rounded-tr-2xl rounded-bl-2xl px-4 py-2 text-2xl font-semibold">
 					CodeLegends</h1>
 			</div>
 			<ul>
