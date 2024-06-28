@@ -1,4 +1,5 @@
 import re
+from base64 import b64encode
 from enum import Enum
 from typing import Literal, Optional
 
@@ -67,6 +68,24 @@ class ProfileSchema(Schema):
     first_name: str
     last_name: str
     profile_picture: Optional[ProfilePictureSchema] = None
+
+    @classmethod
+    def from_orm(cls, obj):
+        data = {
+            "username": obj.username,
+            "role": obj.role,
+            "email": obj.email,
+            "first_name": obj.first_name,
+            "last_name": obj.last_name,
+        }
+
+        if obj.profile_picture and obj.profile_picture_type:
+            data["profile_picture"] = ProfilePictureSchema(
+                type=obj.profile_picture_type,
+                data=b64encode(obj.profile_picture).decode('utf-8')
+            )
+
+        return cls(**data)
 
 
 class TokenRefreshSchema(Schema):
