@@ -12,6 +12,8 @@
     import {onMount} from 'svelte';
     import {getCookie, getUserIDFromJWT} from '$lib/utils';
     import CodeEditor from '../../../components/CodeEditor.svelte';
+    import Waves_4 from '../../../components/Waves_4.svelte';
+
 
     const problem = writable<ProblemSchema | null>(null);
     const error = writable<string | null>(null);
@@ -148,7 +150,13 @@
     }
 </script>
 
-<main class="min-h-screen bg-gray-100 py-10">
+<main class="min-h-screen bg-gray-100 pb-10">
+    <div class="inset-0 z-0">
+        <Waves_4/>
+    </div>
+    {#if $problem}
+        <h1 class="text-5xl font-bold mb-14 text-center">{$problem.title}</h1>
+    {/if}
     <div class="max-w-7xl mx-auto px-4">
         <div class="mb-6">
             {#if $error}
@@ -157,9 +165,9 @@
         </div>
 
         {#if $problem}
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h1 class="text-4xl font-bold mb-8 text-center">{$problem.title}</h1>
+                    <!--                    <h1 class="text-4xl font-bold mb-8 text-center">{$problem.title}</h1>-->
 
                     <div class="flex justify-center items-center space-x-6 mb-8 text-xl">
 						<span class={`px-4 py-2 rounded-full text-white text-xl ${getDifficultyColor($problem.difficulty)}`}>
@@ -220,8 +228,18 @@
                         </div>
 
                         <CodeEditor bind:code={source_code}/>
+                        <button class="btn bg-indigo-600 bg-opacity-80 mt-4 w-full text-white"
+                                on:click={submitCodeHandler}>
+                            Submit Code
+                        </button>
 
-                        <button class="btn bg-indigo-600 mt-4 w-full text-white" on:click={submitCodeHandler}>Submit Code</button>
+<!--                        <button-->
+<!--                                type="button"-->
+<!--                                class="w-full px-4 py-2 mt-4 text-lg rounded-md bg-indigo-200 text-indigo-800 hover:bg-indigo-300 transition-colors border border-indigo-400"-->
+<!--                                on:click={submitCodeHandler}-->
+<!--                        >-->
+<!--                            Submit Code-->
+<!--                        </button>-->
 
                         {#if $loading}
                             <p class="text-blue-500 mt-4">Loading...</p>

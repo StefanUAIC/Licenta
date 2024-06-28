@@ -4,6 +4,7 @@
     import type {CreateProblemPayload} from '$lib/problems_api';
     import {createProblem, createTestCase, verifyTestCases} from '$lib/problems_api';
     import {goto} from '$app/navigation';
+    import Waves_4 from '../../../components/Waves_4.svelte';
 
     let title = '';
     let description = '';
@@ -63,7 +64,7 @@
 
     function addTestCase() {
         testCases.update(cases => {
-            const newCases = [...cases, { stdin: '', expected_output: '' }];
+            const newCases = [...cases, {stdin: '', expected_output: ''}];
             activeTestCase.set(newCases.length - 1);  // Setează noul test case ca activ
             return newCases;
         });
@@ -109,17 +110,20 @@
     }
 </script>
 
-<main class="min-h-screen bg-gray-100 py-10">
+<main class="min-h-screen bg-gray-100 pb-10">
+    <div class="inset-0 z-0">
+      <Waves_4 />
+    </div>
     <div class="max-w-7xl mx-auto px-4">
-        <h1 class="text-3xl font-bold mb-6 text-center">Create Problem</h1>
+        <h1 class="text-5xl font-bold mb-14 text-center">Create Problem</h1>
 
         {#if $error}
             <p class="text-red-500 text-center mb-4">{$error}</p>
         {/if}
 
         <form on:submit|preventDefault={handleSubmit} class="space-y-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="space-y-6 bg-white p-6 rounded-lg shadow">
                     <div>
                         <label class="block font-bold text-xl mb-2" for="title">Problem Title</label>
                         <input id="title" type="text" bind:value={title} required
@@ -150,9 +154,10 @@
                                   class="w-full px-3 py-2 border rounded-md" rows="4"></textarea>
                     </div>
 
-                     <div>
+                    <div>
                         <label class="block font-bold text-xl mb-2" for="difficulty">Difficulty</label>
-                        <select id="difficulty" bind:value={difficulty} required class="w-full px-3 py-2 border rounded-md">
+                        <select id="difficulty" bind:value={difficulty} required
+                                class="w-full px-3 py-2 border rounded-md">
                             {#each difficultyOptions as option}
                                 <option value={option}>{option.charAt(0).toUpperCase() + option.slice(1)}</option>
                             {/each}
@@ -176,10 +181,9 @@
                             {/each}
                         </select>
                     </div>
-
                 </div>
 
-                <div class="space-y-6">
+                <div class="space-y-6 bg-white p-6 rounded-lg shadow">
                     <div>
                         <label class="block font-bold text-xl mb-2" for="memory_limit">Memory Limit (KB)</label>
                         <input id="memory_limit" type="number" bind:value={memory_limit} required
@@ -197,8 +201,23 @@
                         <CodeEditor bind:code={solution_code}/>
                     </div>
 
+                    <button
+                            type="button"
+                            class="w-full px-4 py-2 mb-4 text-lg rounded-md bg-blue-200 text-blue-800 hover:bg-blue-300 transition-colors border border-blue-400"
+                            on:click={handleVerifyTestCases}
+                    >
+                        Verify Test Cases
+                    </button>
+
                     <div>
                         <h2 class="text-2xl font-bold mb-4">Test Cases</h2>
+                        <button
+                                type="button"
+                                class="w-full px-4 py-2 mb-4 text-lg rounded-md bg-green-200 text-green-800 hover:bg-green-300 transition-colors border border-green-400"
+                                on:click={addTestCase}
+                        >
+                            + Add Test Case
+                        </button>
                         <div class="flex flex-wrap gap-2 mb-4">
                             {#each $testCases as _, index}
                                 <button
@@ -209,13 +228,6 @@
                                     Test {index + 1}
                                 </button>
                             {/each}
-                            <button
-                                    type="button"
-                                    class="px-4 py-2 text-lg rounded-md bg-green-200 text-green-800 hover:opacity-80 transition-opacity"
-                                    on:click={addTestCase}
-                            >
-                                + Add Test Case
-                            </button>
                         </div>
 
                         {#if $activeTestCase !== null}
@@ -241,7 +253,7 @@
                                 </div>
                                 <button
                                         type="button"
-                                        class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
+                                        class="px-4 py-2 bg-red-200 text-red-800 rounded hover:bg-red-300 transition-colors border border-red-400"
                                         on:click={() => removeTestCase($activeTestCase)}
                                 >
                                     Remove Test Case
@@ -249,10 +261,6 @@
                             </div>
                         {/if}
                     </div>
-
-                    <button type="button" class="btn btn-secondary w-full mb-4" on:click={handleVerifyTestCases}>
-                        Verify Test Cases
-                    </button>
 
                     {#if $verificationResults.length > 0}
                         <div class="mt-4">
@@ -273,7 +281,9 @@
             </div>
 
             <div class="flex justify-center mt-8">
-                <button type="submit" class="btn btn-primary px-8 py-3 text-lg">Create Problem</button>
+                <button type="submit" class="btn btn-primary px-10 py-4 text-xl bg-indigo-600 hover:bg-indigo-700">
+                    Create Problem
+                </button>
             </div>
         </form>
     </div>
@@ -285,7 +295,7 @@
     }
 
     .btn-primary {
-        @apply bg-blue-500 text-white hover:bg-blue-600 transition-colors;
+        @apply text-white transition-colors;
     }
 
     .btn-secondary {

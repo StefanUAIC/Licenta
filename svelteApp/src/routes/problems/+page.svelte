@@ -60,7 +60,6 @@
 		}
 	};
 
-
 	onMount(async () => {
 		await fetchProblems();
 		let accessToken = getCookie('access');
@@ -71,7 +70,7 @@
 
 	const filteredProblems = derived(
 		[problems, search, difficulty, grade, category],
-		() => {
+		([$problems, $search, $difficulty, $grade, $category]) => {
 			if (!$problems) return [];
 			return $problems.filter(problem => {
 				return (
@@ -87,69 +86,101 @@
 	function handleCreateProblem() {
 		goto('/problems/create');
 	}
+
+	function truncateText(text: string, limit: number): string {
+		return text.length > limit ? text.slice(0, limit) + '...' : text;
+	}
+
+	function toRomanNumeral(num: number): string {
+		const romanNumerals: [number, string][] = [
+			[10, 'X'],
+			[9, 'IX'],
+			[5, 'V'],
+			[4, 'IV'],
+			[1, 'I']
+		];
+		let result = '';
+		for (const [value, symbol] of romanNumerals) {
+			while (num >= value) {
+				result += symbol;
+				num -= value;
+			}
+		}
+		return result;
+	}
 </script>
 
-<main class="min-h-screen bg-gray-100 py-10">
-	<div class="max-w-4xl mx-auto px-4">
-		<h1 class="text-3xl font-bold text-center mb-6">Problem Selector</h1>
-		{#if $error}
-			<p class="text-red-500 text-center mb-4">{$error}</p>
-		{/if}
-		<form on:submit|preventDefault class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-			<input type="text" placeholder="Search" bind:value={$search}
-						 class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-			<select bind:value={$difficulty}
-							class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-				<option value="">All Difficulties</option>
-				<option value="easy">Easy</option>
-				<option value="medium">Medium</option>
-				<option value="hard">Hard</option>
-			</select>
-			<select bind:value={$grade}
-							class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-				<option value="">All Grades</option>
-				<option value="9">9th</option>
-				<option value="10">10th</option>
-				<option value="11">11th</option>
-				<option value="12">12th</option>
-			</select>
-			<select bind:value={$category}
-							class="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500">
-				<option value="">All Categories</option>
-				{#each Object.entries(categoryLabels) as [key, value]}
-					<option value={key}>{value}</option>
+<main class="min-h-screen bg-gray-100 py-16 px-4">
+	<div class="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
+		<aside class="w-full md:w-1/3 space-y-4">
+			{#if $error}
+				<p class="text-red-500 mb-4">{$error}</p>
+			{/if}
+			<form on:submit|preventDefault class="space-y-4">
+				<input type="text" placeholder="Search" bind:value={$search}
+							 class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+				<select bind:value={$difficulty}
+								class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+					<option value="">All Difficulties</option>
+					<option value="easy">Easy</option>
+					<option value="medium">Medium</option>
+					<option value="hard">Hard</option>
+				</select>
+				<select bind:value={$grade}
+								class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+					<option value="">All Grades</option>
+					<option value="9">9th</option>
+					<option value="10">10th</option>
+					<option value="11">11th</option>
+					<option value="12">12th</option>
+				</select>
+				<select bind:value={$category}
+								class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+					<option value="">All Categories</option>
+					{#each Object.entries(categoryLabels) as [key, value]}
+						<option value={key}>{value}</option>
+					{/each}
+				</select>
+			</form>
+			{#if $userRole === 'teacher'}
+				<button on:click={handleCreateProblem} class="w-full btn btn-primary">Create Problem</button>
+			{/if}
+
+			<img src="problems_vector.png" alt="laptop" class="my-16">
+		</aside>
+
+		<section class="w-full md:w-3/4">
+			<ul class="space-y-6">
+				{#each $filteredProblems as problem}
+					<li>
+						<a href={`problems/${problem.id}`} class="block bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+							<h2 class="text-2xl font-bold mb-2">{problem.title}</h2>
+							<div class="border-b border-gray-200 mb-4"></div>
+							<p class="text-gray-700 mb-4">{truncateText(problem.description, 100)}</p>
+							<div class="flex flex-wrap items-center gap-4 text-sm">
+								<span class="px-3 py-1 rounded-full font-semibold
+									{problem.difficulty === 'easy' ? 'bg-green-600 text-white' :
+									problem.difficulty === 'medium' ? 'bg-yellow-600 text-white' :
+									'bg-blue-600 text-white'}">
+									{difficultyLabels[problem.difficulty]}
+								</span>
+								<span class="text-gray-600">Grade: {toRomanNumeral(problem.grade)}</span>
+								<span class="text-gray-600">{categoryLabels[problem.category]}</span>
+							</div>
+						</a>
+					</li>
 				{/each}
-			</select>
-		</form>
-
-		{#if $userRole === 'teacher'}
-			<div class="text-right mb-6">
-				<button on:click={handleCreateProblem} class="btn btn-primary">Create Problem</button>
-			</div>
-		{/if}
-
-		<ul class="space-y-4">
-			{#each $filteredProblems as problem}
-				<li>
-					<a href={`problems/${problem.id}`} class="block bg-white p-4 rounded-lg shadow-md hover:bg-gray-50">
-						<h2 class="text-xl font-bold">{problem.title}</h2>
-						<p class="text-gray-700">{problem.description}</p>
-						<p class="text-gray-600">Difficulty: {difficultyLabels[problem.difficulty]}</p>
-						<p class="text-gray-600">Grade: {gradeLabels[problem.grade]}</p>
-						<p class="text-gray-600">Category: {categoryLabels[problem.category]}</p>
-					</a>
-				</li>
-			{/each}
-		</ul>
+			</ul>
+		</section>
 	</div>
 </main>
 
 <style lang="postcss">
     .btn {
-        @apply px-4 py-2 rounded-lg;
+        @apply px-4 py-2 rounded-lg font-semibold transition-colors duration-300;
     }
 
     .btn-primary {
-        @apply bg-blue-500 text-white;
+        @apply bg-indigo-600 text-white hover:bg-indigo-700;
     }
 </style>
