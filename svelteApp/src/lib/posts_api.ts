@@ -25,3 +25,28 @@ export const createPost = async (data: CreatePostData): Promise<Post> => {
 	const response = await axios.post<Post>(`${API_POSTS_URL}/`, data, getAuthHeaders());
 	return response.data;
 };
+
+export async function likePost(postId: number): Promise<void> {
+    // const response = await fetch(`${API_URL}/posts/${postId}/like`, {
+    //     method: 'POST',
+    //     headers: {
+    //         'Authorization': `Bearer ${getCookie('access')}`
+    //     }
+    // });
+    // if (!response.ok) {
+    //     throw new Error('Failed to like post');
+    // }
+
+}
+
+export async function dislikePost(postId: number): Promise<void> {
+    // const response = await fetch(`${API_URL}/posts/${postId}/dislike`, {
+    //     method: 'POST',
+    //     headers: {
+    //         'Authorization': `Bearer ${getCookie('access')}`
+    //     }
+    // });
+    // if (!response.ok) {
+    //     throw new Error('Failed to dislike post');
+    // }
+}

@@ -1,128 +1,243 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import type { CreatePostData, Post } from '$lib/posts_api';
-	import { createPost, fetchPosts } from '$lib/posts_api';
+    import { onMount } from 'svelte';
+    import type { CreatePostData, Post } from '$lib/posts_api';
+    import { createPost, fetchPosts, likePost, dislikePost } from '$lib/posts_api'
+    import type { ProfileSchema } from '$lib/users_api';
+    import { getProfile } from '$lib/users_api';
+    import { getCookie, getUserIDFromJWT } from '$lib/utils';
 
-	let posts: Post[] = [];
-	let newPost = {
-		title: '',
-		content: ''
-	};
+    let posts: Post[] = [];
+    let newPost = {
+        title: '',
+        content: ''
+    };
+    let user_id: number;
+    interface ExtendedProfileSchema extends ProfileSchema {
+        rank: string;
+        level: number;
+        profilePicture: string;
+    }
 
+    let profilePromise: Promise<ExtendedProfileSchema | null>;
+    let loading = true;
 
-	onMount(async () => {
-		posts = await fetchPosts();
-	});
+    onMount(async () => {
+        posts = await fetchPosts();
+        let access_token = getCookie('access');
+        if (access_token) {
+            user_id = getUserIDFromJWT(access_token);
+            profilePromise = fetchProfile(user_id);
+        } else {
+            profilePromise = Promise.resolve(null);
+        }
+    });
 
-	const addPost = async () => {
-		if (newPost.title.trim() !== '' && newPost.content.trim() !== '') {
-			try {
-				const post: CreatePostData = {
-					title: newPost.title,
-					content: newPost.content
-				};
-				console.log('Creating post:', post);
-				const createdPost = await createPost(post);
-				console.log('Post created:', createdPost);
-				alert('Post created successfully.');
-				newPost.title = '';
-				newPost.content = '';
-			} catch (error) {
-				console.error('Error creating post:', error.message);
-				alert('Failed to create post. Only teachers can create posts.');
-			}
-		}
-	};
+    const fetchProfile = async (user_id: number): Promise<ExtendedProfileSchema | null> => {
+        try {
+            const data = await getProfile(user_id);
+            if (!data) {
+                return null;
+            }
+            const extendedProfile: ExtendedProfileSchema = {
+                ...data,
+                rank: 'Gold',
+                level: 42,
+                profilePicture: 'https://randomuser.me/api/portraits/men/1.jpg'
+            };
+            return extendedProfile;
+        } catch (err) {
+            console.error('Failed to load profile:', err);
+            return null;
+        } finally {
+            loading = false;
+        }
+    };
+
+    const addPost = async () => {
+        if (newPost.title.trim() !== '' && newPost.content.trim() !== '') {
+            try {
+                const post: CreatePostData = {
+                    title: newPost.title,
+                    content: newPost.content
+                };
+                const createdPost = await createPost(post);
+                alert('Post created successfully.');
+                newPost.title = '';
+                newPost.content = '';
+                posts = await fetchPosts();
+            } catch (error) {
+                console.error('Error creating post:', error);
+                alert('Failed to create post. Only teachers can create posts.');
+            }
+        }
+    };
+
+    const handleLike = async (postId: number) => {
+        try {
+            await likePost(postId);
+            posts = await fetchPosts();
+        } catch (error) {
+            console.error('Error liking post:', error);
+            alert('Failed to like post.');
+        }
+    };
+
+    const handleDislike = async (postId: number) => {
+        try {
+            await dislikePost(postId);
+            posts = await fetchPosts();
+        } catch (error) {
+            console.error('Error disliking post:', error);
+            alert('Failed to dislike post.');
+        }
+    };
+
+    function formatDate(dateString: string): string {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
 </script>
 
 <style>
-    .bg-white {
+    .post-container {
         background-color: white;
-    }
-
-    .shadow-md {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .rounded-lg {
         border-radius: 0.5rem;
-    }
-
-    .p-6 {
         padding: 1.5rem;
+        margin-bottom: 1.5rem;
     }
-
-    .mb-4 {
+    .profile-picture {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .likes-dislikes {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .divider {
+        height: 24px;
+        width: 1px;
+        background-color: #D1D5DB;
+    }
+    .input-container {
+        position: relative;
         margin-bottom: 1rem;
     }
-
-    .w-full {
+    .input-container input,
+    .input-container textarea {
         width: 100%;
+        padding: 0.75rem;
+        padding-left: 3rem;
+        border: 1px solid #D1D5DB;
+        border-radius: 0.25rem;
+        font-size: 1.1rem;
     }
-
-    .border {
-        border-width: 1px;
+    .input-container label {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6B7280;
+        pointer-events: none;
+        transition: 0.2s ease all;
+        font-size: 1.1rem;
     }
-
-    .border-gray-300 {
-        border-color: #D1D5DB;
+    .input-container textarea + label {
+        top: 1rem;
+        transform: none;
     }
-
-    .px-4 {
-        padding-left: 1rem;
-        padding-right: 1rem;
+    .input-container input:focus + label,
+    .input-container textarea:focus + label,
+    .input-container input:not(:placeholder-shown) + label,
+    .input-container textarea:not(:placeholder-shown) + label {
+        top: -0.5rem;
+        font-size: 0.875rem;
+        background-color: white;
+        padding: 0 0.25rem;
     }
-
-    .py-2 {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
+    .post-title {
+        /*font-size: 1.5rem;*/
+        font-weight: bold;
+        margin-bottom: 0.5rem;
     }
-
-    .bg-indigo-600 {
-        background-color: #4F46E5;
+    .post-content {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
     }
-
-    .text-white {
-        color: white;
-    }
-
-    .px-6 {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-    }
-
-    .hover\:bg-indigo-700:hover {
-        background-color: #4338CA;
-    }
-
-    .mt-8 {
-        margin-top: 2rem;
+    .post-date {
+        color: #9CA3AF;
+        font-size: 0.875rem;
+        text-align: right;
     }
 </style>
 
-<div class="bg-white shadow-md rounded-lg p-6">
-	<h3 class="text-xl font-bold mb-4">Add a new post</h3>
-	<form on:submit|preventDefault={addPost}>
-		<div class="mb-4">
-			<label for="title" class="block mb-2">Title:</label>
-			<input type="text" id="title" bind:value={newPost.title}
-				   class="w-full border border-gray-300 rounded-lg px-4 py-2">
-		</div>
-		<div class="mb-4">
-			<label for="content" class="block mb-2">Content:</label>
-			<textarea id="content" bind:value={newPost.content}
-					  class="w-full border border-gray-300 rounded-lg px-4 py-2"></textarea>
-		</div>
-		<button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">Add post
-		</button>
-	</form>
+<div class="post-container">
+    {#await profilePromise}
+        <p>Loading profile...</p>
+    {:then profile}
+        {#if profile}
+            <div class="flex items-center mb-4">
+                <img src={profile.profilePicture} alt="Profile" class="profile-picture mr-4">
+                <div class="input-container flex-grow">
+                    <input type="text" id="title" bind:value={newPost.title} placeholder=" ">
+                    <label for="title">Title</label>
+                </div>
+            </div>
+            <form on:submit|preventDefault={addPost}>
+                <div class="input-container">
+                    <textarea id="content" bind:value={newPost.content} placeholder=" " rows="4"></textarea>
+                    <label for="content">Content</label>
+                </div>
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 text-lg">Post</button>
+            </form>
+        {:else}
+            <p>Profile not available. Please log in.</p>
+        {/if}
+    {:catch error}
+        <p>Error loading profile: {error.message}</p>
+    {/await}
 </div>
 
 <div class="mt-8">
-	{#each posts as post (post.id)}
-		<div class="bg-white shadow-md rounded-lg p-6 mb-4">
-			<h3 class="text-xl font-bold mb-2">{post.title}</h3>
-			<p>{post.content}</p>
-		</div>
-	{/each}
+    {#each posts as post (post.id)}
+        <div class="post-container">
+            <div class="flex items-center mb-4">
+                <img src={"https://randomuser.me/api/portraits/men/1.jpg"} alt="Author" class="profile-picture mr-4">
+                <div>
+                    <h3 class="post-title text-3xl">{post.title}</h3>
+
+                    <span class="text-lg"> Postat de: {post.author}</span>
+                </div>
+            </div>
+
+            <p class="post-content">{post.content}</p>
+            <div class="flex justify-between items-end">
+                <div class="likes-dislikes">
+                    <button on:click={() => handleLike(post.id)} class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" viewBox="0 0 20 20" fill={true ? "currentColor" : "none"} stroke="currentColor">
+                            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                        </svg>
+<!--                        <span class="text-lg">{post.likes}</span>-->
+                        <span class="text-lg">69</span>
+
+                    </button>
+                    <div class="divider"></div>
+                    <button on:click={() => handleDislike(post.id)} class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" viewBox="0 0 20 20" fill={false ? "currentColor" : "none"} stroke="currentColor">
+                            <path d="M18 9.5a1.5 1.5 0 11-3 0v-6a1.5 1.5 0 013 0v6zM14 9.667v-5.43a2 2 0 00-1.105-1.79l-.05-.025A4 4 0 0011.055 2H5.64a2 2 0 00-1.962 1.608l-1.2 6A2 2 0 004.44 12H8v4a2 2 0 002 2 1 1 0 001-1v-.667a4 4 0 01.8-2.4l1.4-1.866a4 4 0 00.8-2.4z" />
+                        </svg>
+<!--                        <span class="text-lg">{post.dislikes}</span>-->
+                        <span class="text-lg">69</span>
+                    </button>
+                </div>
+                <div class="post-date">
+                    {formatDate(post.created_at)}
+                </div>
+            </div>
+        </div>
+    {/each}
 </div>
