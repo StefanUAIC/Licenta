@@ -22,7 +22,7 @@ def submit_and_test_code(source_code, language_id, test_cases, memory_limit, tim
             "stdin": test_case.stdin,
             "cpu_time_limit": time_limit,
             "cpu_extra_time": 1,
-            "wall_time_limit": time_limit * 10,
+            "wall_time_limit": 20.0,
         }
         response = requests.post(api_url, json=data, headers=headers)
         print(response.json())
