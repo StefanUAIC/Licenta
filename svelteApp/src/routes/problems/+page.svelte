@@ -149,7 +149,7 @@ const categoryLabels: Record<string, string> = {
 				</select>
 			</form>
 			{#if $userRole === 'teacher'}
-				<button on:click={handleCreateProblem} class="w-full btn btn-primary">Create Problem</button>
+				<button on:click={handleCreateProblem} class="w-full btn btn-primary">Creează Problemă</button>
 			{/if}
 
 			<img src="problems_vector.png" alt="laptop" class="my-16">

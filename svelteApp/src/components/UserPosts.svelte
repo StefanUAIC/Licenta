@@ -182,18 +182,18 @@
                 {/if}
                 <div class="input-container flex-grow">
                     <input type="text" id="title" bind:value={newPost.title} placeholder=" ">
-                    <label for="title">Title</label>
+                    <label for="title">Titlu</label>
                 </div>
             </div>
             <form on:submit|preventDefault={addPost}>
                 <div class="input-container">
                     <textarea id="content" bind:value={newPost.content} placeholder=" " rows="4"></textarea>
-                    <label for="content">Content</label>
+                    <label for="content">Conținut</label>
                 </div>
-                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 text-lg">Post</button>
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 text-lg">Postează</button>
             </form>
         {:else}
-            <p>Profile not available. Please log in.</p>
+            <p>Profil indisponibil, te rog autentifică-te!</p>
         {/if}
     {:catch error}
         <p>Error loading profile: {error.message}</p>

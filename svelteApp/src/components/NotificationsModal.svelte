@@ -34,13 +34,13 @@
 <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50" class:hidden={!isOpen}>
 	<div class="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto max-h-full overflow-y-auto" class:hidden={!isOpen}>
 		<div class="flex justify-between items-center mb-4">
-			<h2 class="text-xl font-bold">Notifications</h2>
+			<h2 class="text-xl font-bold">Notificări</h2>
 			<button class="text-white bg-red-500 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center" on:click={onClose}>
 				✖
 			</button>
 		</div>
 		{#if $notifications.length === 0}
-			<p>There are no new notifications available for you</p>
+			<p>Nu există nicio notificare disponibilă.</p>
 		{:else}
 			<div class="overflow-y-auto max-h-96">
 				{#each $notifications as notification (notification.id)}

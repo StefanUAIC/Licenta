@@ -384,7 +384,7 @@
 
 					{#if $verificationResults.length > 0}
 						<div class="mt-4">
-							<h3 class="text-xl font-semibold mb-2">Verification Results</h3>
+							<h3 class="text-xl font-semibold mb-2">Rezultatele verificării</h3>
 							<div class="flex flex-wrap gap-2">
 								{#each $verificationResults as result, index}
 									<button
