@@ -25,7 +25,6 @@ def submit_and_test_code(source_code, language_id, test_cases, memory_limit, tim
             "wall_time_limit": 20.0,
         }
         response = requests.post(api_url, json=data, headers=headers)
-        print(response.json())
         token = response.json().get("token")
 
         if not token:
@@ -40,7 +39,6 @@ def submit_and_test_code(source_code, language_id, test_cases, memory_limit, tim
             if status_id in [1, 2]:
                 continue
 
-        print(result_data)
         memory_exceeded = result_data.get("memory", 0) > memory_limit
         time_exceeded = float(result_data.get("time", 0)) > time_limit
 
