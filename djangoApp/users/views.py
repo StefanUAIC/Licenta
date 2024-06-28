@@ -148,13 +148,10 @@ def update_profile(request, user_id: int, profile_data: UpdateProfileSchema):
             user.last_name = profile_data.last_name
 
         if profile_data.profile_picture:
-            # Decode base64 string to binary data
             profile_picture_data = base64.b64decode(profile_data.profile_picture)
 
-            # Save binary data directly to BinaryField
             user.profile_picture = profile_picture_data
 
-            # Set profile picture type (assuming it's always JPEG, adjust if needed)
             user.profile_picture_type = 'image/jpeg'
 
         user.save()
@@ -225,8 +222,8 @@ def list_teacher_problems(request, user_id: int):
 @user_router.get('/{user_id}/solutions', auth=jwt_auth, response={200: List[SolutionSchema], 400: dict})
 def list_user_solutions(request, user_id: int):
     user = request.user
-    if user_id != user.id:
-        return 400, {"error": "You can only view your own solutions"}
+    # if user_id != user.id:
+    #     return 400, {"error": "You can only view your own solutions"}
 
     solutions = Solution.objects.filter(user=user)
     return [SolutionSchema.from_orm(solution) for solution in solutions]
@@ -241,3 +238,12 @@ def get_user_count(request, role: Literal['all', 'student', 'teacher']):
         return 400, {"errors": [ErrorDetailSchema(field="role", message="Invalid role specified")]}
     count = User.objects.filter(role=role).count()
     return 200, count
+
+
+@user_router.get('/', auth=jwt_auth, response={200: List[int], 500: ErrorResponseSchema})
+def get_all_users_ids(request):
+    try:
+        user_ids = User.objects.values_list('id', flat=True)
+        return 200, list(user_ids)
+    except Exception as e:
+        return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
