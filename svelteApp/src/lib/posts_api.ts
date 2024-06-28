@@ -9,6 +9,7 @@ export interface Post {
 	content: string;
 	author: string;
 	created_at: string;
+	author_id: number;
 }
 
 export interface CreatePostData {

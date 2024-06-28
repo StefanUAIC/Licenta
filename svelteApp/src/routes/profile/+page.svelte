@@ -94,7 +94,7 @@
 			{#if profile}
 				<div class="bg-white rounded-lg shadow-lg flex p-6 h-60">
 					<img
-						src={profile.profile_picture ? `data:image/${profile.profile_picture.type};base64,${profile.profile_picture.data}` : '/default-profile.jpg'}
+						src={profile.profile_picture ? `data:image/${profile.profile_picture.type};base64,${profile.profile_picture.data}` : '/default-profile-picture.png'}
 						alt={'Profile picture of ' + profile.first_name + ' ' + profile.last_name}
 						class="h-full w-auto object-cover mr-6">
 					<div class="flex-1 flex flex-col justify-center text-2xl">
