@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Literal
 
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
@@ -140,3 +140,14 @@ def list_classes(request, user_id: int):
     return [ClassResponseSchema(id=class_instance.id, name=class_instance.name, teacher_id=class_instance.teacher_id,
                                 tag=class_instance.tag)
             for class_instance in classes]
+
+
+@user_router.get('/count/{role}', auth=jwt_auth, response={200: int, 400: ErrorResponseSchema})
+def get_user_count(request, role: Literal['all', 'student', 'teacher']):
+    if role == 'all':
+        count = User.objects.count()
+        return 200, count
+    if role not in ['student', 'teacher']:
+        return 400, {"errors": [ErrorDetailSchema(field="role", message="Invalid role specified")]}
+    count = User.objects.filter(role=role).count()
+    return 200, count

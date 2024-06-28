@@ -1,7 +1,9 @@
 import re
 from enum import Enum
+from typing import Literal
 
 from ninja import Schema
+from pydantic import BaseModel
 from pydantic import EmailStr, constr, field_validator
 
 
@@ -71,3 +73,4 @@ class RefreshTokenSchema(Schema):
 
 class RoleResponseSchema(Schema):
     role: str
+

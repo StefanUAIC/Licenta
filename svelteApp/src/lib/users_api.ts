@@ -56,10 +56,16 @@ export const getUserClasses = async (userId: number): Promise<ClassResponse[]> =
 };
 
 
-export const getStudentCount = () => {
-  return Math.floor(Math.random() * 4000) + 1000;
-}
-
-export const getTeacherCount = () => {
-  return Math.floor(Math.random() * 250) + 50;
-}
+export const getUserCount = async (role: string): Promise<number> => {
+	try {
+		const response = await axios.get<number>(`${API_USERS_URL}/count/${role}`, getAuthHeaders());
+		return response.data;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			console.log(error.response.data.errors);
+			throw error.response.data.errors;
+		} else {
+			throw new Error('An unexpected error occurred');
+		}
+	}
+};

@@ -174,6 +174,10 @@
         align-items: center;
         margin-bottom: 2.5rem;
         margin-top: 1rem;
+        text-decoration: none;
+        color: inherit;
+        -webkit-tap-highlight-color: transparent;
+		user-select: none;
     }
 
     .app-logo img {
@@ -181,6 +185,13 @@
         height: 10rem;
         margin-bottom: 1rem;
     }
+
+    .app-logo:hover, .app-logo:focus, .app-logo:active {
+        outline: none;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+
 
     .separator {
         height: 0.2rem;
@@ -212,11 +223,11 @@
 
 		<nav
 			class="list-nav fixed top-0 left-0 w-56 h-full color-nav z-10 p-4 sidebar {sidebarVisible ? 'visible' : ''}">
-			<div class="app-logo">
+			<a href="/home" class="app-logo">
 				<img src="/logo.png" alt="Logo">
 				<h1 class="bg-white text-blue-500 rounded-tr-2xl rounded-bl-2xl px-4 py-2 text-2xl font-semibold">
 					CodeLegends</h1>
-			</div>
+			</a>
 			<ul>
 				<li class="relative">
 					<a href="/posts" on:click={() => updateCurrentPage('/posts')}
