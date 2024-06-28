@@ -1,6 +1,6 @@
 import re
 from enum import Enum
-from typing import Literal
+from typing import Literal, Optional
 
 from ninja import Schema
 from pydantic import BaseModel
@@ -55,12 +55,18 @@ class ErrorResponseSchema(Schema):
     errors: list[ErrorDetailSchema]
 
 
+class ProfilePictureSchema(BaseModel):
+    type: str
+    data: str
+
+
 class ProfileSchema(Schema):
     username: str
     role: str
     email: str
     first_name: str
     last_name: str
+    profile_picture: Optional[ProfilePictureSchema] = None
 
 
 class TokenRefreshSchema(Schema):
@@ -74,3 +80,8 @@ class RefreshTokenSchema(Schema):
 class RoleResponseSchema(Schema):
     role: str
 
+
+class UpdateProfileSchema(Schema):
+    first_name: constr(min_length=1, max_length=30, pattern=r'^[a-zA-Z]*$')
+    last_name: constr(min_length=1, max_length=30, pattern=r'^[a-zA-Z]*$')
+    profile_picture: str | None

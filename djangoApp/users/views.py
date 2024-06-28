@@ -1,7 +1,9 @@
+import base64
 from typing import List, Literal
 
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from ninja import Router
 from rest_framework_simplejwt.exceptions import InvalidToken
@@ -9,8 +11,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from classes.models import Class
 from classes.schemas import ClassResponseSchema
+from problems.schemas import ProblemSchema
+from solutions.models import Solution
+from solutions.schemas import SolutionSchema
 from .authentication import jwt_auth
-from .schemas import ErrorResponseSchema, ErrorDetailSchema
+from .schemas import ErrorResponseSchema, ErrorDetailSchema, UpdateProfileSchema
 from .schemas import ProfileSchema, RoleResponseSchema
 from .schemas import TokenRefreshSchema, RefreshTokenSchema
 from .schemas import UserSchema, TokenSchema, LoginSchema
@@ -101,19 +106,81 @@ def refresh(request, refresh_token: RefreshTokenSchema):
         return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
-@user_router.get('/{user_id}', auth=jwt_auth, response={200: ProfileSchema, 401: ErrorResponseSchema})
+@user_router.get('/{user_id}', auth=jwt_auth,
+                 response={200: ProfileSchema, 401: ErrorResponseSchema, 404: ErrorResponseSchema})
 def profile(request, user_id: int):
     try:
         user = User.objects.get(id=user_id)
+        profile_picture_data = None
+        if user.profile_picture:
+            profile_picture_data = {
+                'data': base64.b64encode(user.profile_picture).decode('utf-8'),
+                'type': user.profile_picture_type
+            }
+
         return 200, ProfileSchema(
             username=user.username,
             role=user.role,
             email=user.email,
             first_name=user.first_name,
-            last_name=user.last_name
+            last_name=user.last_name,
+            profile_picture=profile_picture_data
         )
+    except ObjectDoesNotExist:
+        return 404, {"errors": [ErrorDetailSchema(field="user_id", message="User not found")]}
     except Exception as e:
         return 401, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
+
+
+@user_router.put('/{user_id}/profile', auth=jwt_auth,
+                 response={200: ProfileSchema, 400: ErrorResponseSchema, 404: ErrorResponseSchema,
+                           500: ErrorResponseSchema})
+def update_profile(request, user_id: int, profile_data: UpdateProfileSchema):
+    try:
+        print(f"Received profile update request for user {user_id}: {profile_data}")
+        user = User.objects.get(id=user_id)
+        if user.id != request.user.id:
+            return 400, {"errors": [ErrorDetailSchema(field="user_id", message="You can only update your own profile")]}
+
+        if profile_data.first_name:
+            user.first_name = profile_data.first_name
+        if profile_data.last_name:
+            user.last_name = profile_data.last_name
+
+        if profile_data.profile_picture:
+            # Decode base64 string to binary data
+            profile_picture_data = base64.b64decode(profile_data.profile_picture)
+
+            # Save binary data directly to BinaryField
+            user.profile_picture = profile_picture_data
+
+            # Set profile picture type (assuming it's always JPEG, adjust if needed)
+            user.profile_picture_type = 'image/jpeg'
+
+        user.save()
+
+        profile_picture_response = None
+        if user.profile_picture:
+            profile_picture_response = {
+                'data': base64.b64encode(user.profile_picture).decode('utf-8'),
+                'type': user.profile_picture_type
+            }
+
+        response_data = ProfileSchema(
+            username=user.username,
+            role=user.role,
+            email=user.email,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            profile_picture=profile_picture_response
+        )
+        print(f"Profile update response: {response_data}")
+        return 200, response_data
+    except ObjectDoesNotExist:
+        return 404, {"errors": [ErrorDetailSchema(field="user_id", message="User not found")]}
+    except Exception as e:
+        print(f"Error updating profile: {str(e)}")
+        return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
 
 
 @user_router.get('/{user_id}/role', auth=jwt_auth,
@@ -140,6 +207,29 @@ def list_classes(request, user_id: int):
     return [ClassResponseSchema(id=class_instance.id, name=class_instance.name, teacher_id=class_instance.teacher_id,
                                 tag=class_instance.tag)
             for class_instance in classes]
+
+
+@user_router.get('/{user_id}/problems', auth=jwt_auth, response={200: List[ProblemSchema], 400: dict, 403: dict})
+def list_teacher_problems(request, user_id: int):
+    user = request.user
+    if user_id != user.id:
+        return 400, {"error": "You can only view your own problems"}
+
+    if user.role != 'teacher':
+        return 403, {"error": "Only teachers can access this endpoint"}
+
+    problems = Problem.objects.filter(created_by=user)
+    return 200, [ProblemSchema.from_orm(problem) for problem in problems]
+
+
+@user_router.get('/{user_id}/solutions', auth=jwt_auth, response={200: List[SolutionSchema], 400: dict})
+def list_user_solutions(request, user_id: int):
+    user = request.user
+    if user_id != user.id:
+        return 400, {"error": "You can only view your own solutions"}
+
+    solutions = Solution.objects.filter(user=user)
+    return [SolutionSchema.from_orm(solution) for solution in solutions]
 
 
 @user_router.get('/count/{role}', auth=jwt_auth, response={200: int, 400: ErrorResponseSchema})
