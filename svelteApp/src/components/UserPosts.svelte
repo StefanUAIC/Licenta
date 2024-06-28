@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import type { CreatePostData, Post } from '$lib/posts_api';
-    import { createPost, fetchPosts, likePost, dislikePost } from '$lib/posts_api';
+    import { createPost, dislikePost, fetchPosts, likePost } from '$lib/posts_api';
     import type { ProfileSchema } from '$lib/users_api';
     import { getProfile } from '$lib/users_api';
     import { getCookie, getUserIDFromJWT } from '$lib/utils';
@@ -13,7 +13,6 @@
     };
     let user_id: number;
     let profilePromise: Promise<ProfileSchema | null>;
-    let loading = true;
 
     onMount(async () => {
         await loadPosts();
@@ -41,24 +40,22 @@
 
     const fetchProfile = async (user_id: number): Promise<ProfileSchema | null> => {
         try {
-            const data = await getProfile(user_id);
-            return data;
+            return await getProfile(user_id);
         } catch (err) {
             console.error('Failed to load profile:', err);
             return null;
-        } finally {
-            loading = false;
         }
     };
 
-    const addPost = async () => {
+    const addPost = async () =>
+    {
         if (newPost.title.trim() !== '' && newPost.content.trim() !== '') {
             try {
                 const post: CreatePostData = {
                     title: newPost.title,
                     content: newPost.content
                 };
-                const createdPost = await createPost(post);
+                await createPost(post);
                 alert('Postare creată cu succes! Acum așteaptă să o verifice administratorul.');
                 newPost.title = '';
                 newPost.content = '';
@@ -68,7 +65,8 @@
                 alert('Failed to create post. Only teachers can create posts.');
             }
         }
-    };
+    }
+;
 
     const handleLike = async (postId: number) => {
         try {
@@ -127,8 +125,7 @@
     .input-container input,
     .input-container textarea {
         width: 100%;
-        padding: 0.75rem;
-        padding-left: 3rem;
+        padding: 0.75rem 0.75rem 0.75rem 3rem;
         border: 1px solid #D1D5DB;
         border-radius: 0.25rem;
         font-size: 1.1rem;
