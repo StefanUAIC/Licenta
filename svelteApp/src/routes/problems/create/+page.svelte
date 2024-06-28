@@ -2,7 +2,8 @@
     import {writable} from 'svelte/store';
     import CodeEditor from '../../../components/CodeEditor.svelte';
     import type {CreateProblemPayload} from '$lib/problems_api';
-    import {createProblem, createTestCase, verifyTestCases} from '$lib/problems_api';
+    import {createProblem, createTestCase} from '$lib/problems_api';
+    import {verifyTestCases} from '$lib/code_submission_api';
     import {goto} from '$app/navigation';
 
     let title = '';
@@ -53,7 +54,7 @@
                 await createTestCase(problemId, testCase);
             }
 
-            alert('Problem created successfully. Now wait for the admin to approve it');
+            alert('Problemă creată cu succes! Acum așteaptă să fie verificată de administrator.');
             await goto(`/problems`);
         } catch (err) {
             error.set('Failed to create problem or test cases');
@@ -64,7 +65,7 @@
     function addTestCase() {
         testCases.update(cases => {
             const newCases = [...cases, { stdin: '', expected_output: '' }];
-            activeTestCase.set(newCases.length - 1);  // Setează noul test case ca activ
+            activeTestCase.set(newCases.length - 1);
             return newCases;
         });
     }
