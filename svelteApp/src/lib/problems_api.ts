@@ -103,6 +103,3 @@ export const createTestCase = async (problemId: number, testCase: {
 		}
 	}
 };
-
-export class verifyTestCases {
-}

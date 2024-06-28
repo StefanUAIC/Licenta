@@ -175,3 +175,7 @@ svelteApp/.idea/vcs.xml
 djangoApp/.idea/djangoApp.iml
 djangoApp/.idea/djangoApp.iml
 djangoApp/.idea/misc.xml
+svelteApp/.idea/jsLibraryMappings.xml
+djangoApp/.idea/misc.xml
+djangoApp/.idea/djangoApp.iml
+djangoApp/.idea/dataSources.xml

@@ -18,7 +18,7 @@
 			document.cookie = `refresh=${response.refresh}; path=/; SameSite=Strict`;
 
 			errors = '';
-			await goto('/posts');
+			await goto('/home');
 		} catch (err) {
 			console.log('Error:', err);
 			if (Array.isArray(err)) {

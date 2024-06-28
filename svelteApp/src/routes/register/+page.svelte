@@ -113,9 +113,7 @@
 			document.cookie = `access=${response.access}; path=/; SameSite=Strict`;
 			document.cookie = `refresh=${response.refresh}; path=/; SameSite=Strict`;
 
-			console.log('Registered:', response);
-
-			await goto('/posts');
+			await goto('/home');
 		} catch (err) {
 			console.log('Registration error:', err);
 			if (Array.isArray(err)) {

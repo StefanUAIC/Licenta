@@ -45,7 +45,7 @@
 		<div class="container mx-auto px-4 py-8 relative z-10">
 			<div class="flex flex-col items-center mb-12">
 				<div
-					class="logo-container w-1/4 aspect-square rounded-full shadow-2xl mb-6 flex items-center justify-center bg-white bg-opacity-25">
+					class="logo-container w-1/5 aspect-square rounded-full shadow-2xl mb-6 flex items-center justify-center bg-white bg-opacity-25">
 					<img src="/logo.png" alt="Logo" class="w-full h-full object-contain p-2" />
 				</div>
 				<div class="bg-white p-3 rounded-tr-3xl rounded-bl-3xl">
