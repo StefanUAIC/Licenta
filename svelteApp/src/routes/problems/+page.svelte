@@ -29,26 +29,27 @@
 		12: '12th'
 	};
 
-	const categoryLabels: Record<string, string> = {
-		'arrays': 'Arrays',
-		'linked_lists': 'Linked Lists',
-		'sorting': 'Sorting',
-		'searching': 'Searching',
-		'trees': 'Trees',
-		'graphs': 'Graphs',
-		'dynamic_programming': 'Dynamic Programming',
-		'recursion': 'Recursion',
-		'backtracking': 'Backtracking',
-		'bit_manipulation': 'Bit Manipulation',
-		'greedy': 'Greedy',
-		'math': 'Math',
-		'geometry': 'Geometry',
-		'combinatorics': 'Combinatorics',
-		'probability': 'Probability',
-		'game_theory': 'Game Theory',
-		'puzzles': 'Puzzles',
-		'miscellaneous': 'Miscellaneous'
-	};
+const categoryLabels: Record<string, string> = {
+    'arrays': 'Vectori',
+    'linked_lists': 'Liste Înlănțuite',
+    'sorting': 'Sortare',
+    'searching': 'Căutare',
+    'trees': 'Arbori',
+    'graphs': 'Grafuri',
+    'dynamic_programming': 'Programare Dinamică',
+    'recursion': 'Recursivitate',
+    'backtracking': 'Backtracking',
+    'bit_manipulation': 'Manipulare de Biți',
+    'greedy': 'Algoritmi Greedy',
+    'math': 'Matematică',
+    'geometry': 'Geometrie',
+    'combinatorics': 'Combinatorică',
+    'probability': 'Probabilitate',
+    'game_theory': 'Teoria Jocurilor',
+    'puzzles': 'Puzzle-uri',
+    'miscellaneous': 'Diverse'
+};
+
 
 	const fetchProblems = async () => {
 		try {

@@ -257,13 +257,13 @@
 				<li class="relative">
 					<a href="/profile" on:click={() => updateCurrentPage('/profile')}
 					   class={`nav-link block rounded-md px-4 py-2 ${currentPage === '/profile' ? 'active-page' : ''}`}>
-						<i class="fas fa-user mr-2 w-8"></i> Profil
+						<i class="fas fa-user mr-1 w-8"></i> Profil
 					</a>
 				</li>
 				<li class="relative">
 					<button on:click={toggleReportIssueModal}
 							class="nav-link block rounded-md px-4 py-2 text-left">
-						<i class="fas fa-exclamation-circle mr-1 w-11"></i> Report an Issue
+						<i class="fas fa-exclamation-circle mr-1 w-12"></i> Raportează Eroare
 					</button>
 				</li>
 				<div class="separator"></div>
