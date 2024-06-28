@@ -23,7 +23,8 @@ def create_post(request, payload: PostSchema):
         title=post.title,
         content=post.content,
         author=str(post.author),
-        created_at=post.created_at
+        created_at=post.created_at,
+        author_id=post.author.id
     )
 
 
@@ -35,5 +36,6 @@ def list_posts(request):
         title=post.title,
         content=post.content,
         author=str(post.author),
-        created_at=post.created_at
+        created_at=post.created_at,
+        author_id=post.author.id
     ) for post in posts]

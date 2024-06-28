@@ -15,6 +15,7 @@ class PostOutSchema(Schema):
     content: str
     author: str
     created_at: str
+    author_id: int
 
     @field_validator('created_at', mode='before')
     def format_created_at(cls, value: datetime) -> str:
