@@ -48,7 +48,7 @@
 </style>
 
 <AppShell>
-	<div id="target">
+	<div id="target overflow-y-hidden overflow-x-hidden">
 		<div class="container mx-auto pt-8">
 			<div class="flex flex-col md:flex-row items-center justify-between">
 				<div class="md:w-2/3 text-center">

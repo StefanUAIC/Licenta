@@ -102,8 +102,15 @@
 		color: #ffffff;
 		text-align: left;
 	}
-	.table th, .table td {
+	.table th {
 		padding: 12px 15px;
+		font-size: 1rem;
+		text-align: center;
+	}
+	.table td {
+		padding: 12px 15px;
+		font-size: 1.5rem;
+		text-align: center
 	}
 	.table tbody tr {
 		border-bottom: 1px solid #dddddd;
@@ -119,6 +126,8 @@
 		height: 50px;
 		border-radius: 50%;
 		object-fit: cover;
+		display: block;
+		margin: 0 auto;
 	}
 </style>
 

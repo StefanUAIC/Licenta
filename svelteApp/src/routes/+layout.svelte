@@ -136,7 +136,7 @@
         padding: 0.75rem;
         position: fixed;
         top: 1rem;
-        right: 1rem;
+        right: 1.5rem;
         z-index: 20;
         background-color: white;
         border: none;
