@@ -222,8 +222,6 @@ def list_teacher_problems(request, user_id: int):
 @user_router.get('/{user_id}/solutions', auth=jwt_auth, response={200: List[SolutionSchema], 400: dict})
 def list_user_solutions(request, user_id: int):
     user = request.user
-    # if user_id != user.id:
-    #     return 400, {"error": "You can only view your own solutions"}
 
     solutions = Solution.objects.filter(user=user)
     return [SolutionSchema.from_orm(solution) for solution in solutions]
