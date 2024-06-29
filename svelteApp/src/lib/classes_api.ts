@@ -1,4 +1,3 @@
-// src/lib/classes_api.ts
 import axios from 'axios';
 import { getAuthHeaders } from '$lib/utils';
 import type { ProfileSchema } from '$lib/users_api';
