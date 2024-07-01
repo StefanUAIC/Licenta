@@ -40,7 +40,7 @@
 			console.log('Updating profile:', profileData);
 			await updateProfile(userId, profileData);
 			closeModal();
-			// window.location.reload();
+			window.location.reload();
 		} catch (error) {
 			console.error('Failed to update profile:', error);
 			alert('Failed to update profile. Please try again.');

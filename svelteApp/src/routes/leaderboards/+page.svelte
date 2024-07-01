@@ -65,7 +65,7 @@
 			const solutions = await getUserSolutions(userId);
 			console.log(`Solutions for user ${userId}:`, solutions);
 			return solutions;
-		} catch (err) {
+		} catch (err: any) {
 			console.error(`Error fetching solutions for user ${userId}:`, err.response?.data || err.message || err);
 			return [];
 		}
