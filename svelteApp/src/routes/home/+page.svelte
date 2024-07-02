@@ -50,7 +50,7 @@
                     <img src="/logo.png" alt="Logo" class="w-full h-full object-contain p-2"/>
                 </div>
                 <div class="bg-white p-3 rounded-tr-3xl rounded-bl-3xl">
-                    <h1 class="text-5xl font-bold text-blue-600">CodeLegends</h1>
+                    <h1 class="text-6xl font-bold text-blue-600">CodeLegends</h1>
                 </div>
             </div>
 

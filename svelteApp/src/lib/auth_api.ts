@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getAuthHeaders } from '$lib/utils';
 
 const API_USERS_URL = import.meta.env.VITE_API_USERS_URL;
 
@@ -23,9 +24,13 @@ interface AccessTokenSchema {
 	access: string;
 }
 
-
 export interface RoleResponse {
 	role: 'student' | 'teacher';
+}
+
+interface ChangePasswordData {
+	old_password: string;
+	new_password: string;
 }
 
 export const login = async (username: string, password: string): Promise<TokenSchema> => {
@@ -56,7 +61,6 @@ export const register = async (user: UserSchema): Promise<TokenSchema> => {
 	}
 };
 
-
 export const refreshAccessToken = async (refreshToken: string): Promise<AccessTokenSchema> => {
 	try {
 		const response = await axios.post<AccessTokenSchema>(`${API_USERS_URL}/refresh`, { refresh: refreshToken });
@@ -71,4 +75,15 @@ export const refreshAccessToken = async (refreshToken: string): Promise<AccessTo
 	}
 };
 
-
+export const changePassword = async (userId: number, passwordData: ChangePasswordData): Promise<void> => {
+	try {
+		await axios.post(`${API_USERS_URL}/${userId}/change-password`, passwordData, getAuthHeaders());
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			console.log(error.response.data.errors);
+			throw error.response.data.errors;
+		} else {
+			throw new Error('An unexpected error occurred');
+		}
+	}
+};

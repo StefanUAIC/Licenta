@@ -68,7 +68,6 @@
 
 	function closeEditProfileModal() {
 		showEditProfileModal.set(false);
-		// Reîncarcă profilul după editare
 		profilePromise = fetchProfile(user_id);
 	}
 
