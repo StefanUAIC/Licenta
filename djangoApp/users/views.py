@@ -15,7 +15,7 @@ from problems.schemas import ProblemSchema
 from solutions.models import Solution
 from solutions.schemas import SolutionSchema
 from .authentication import jwt_auth
-from .schemas import ErrorResponseSchema, ErrorDetailSchema, UpdateProfileSchema
+from .schemas import ErrorResponseSchema, ErrorDetailSchema, UpdateProfileSchema, ChangePasswordSchema
 from .schemas import ProfileSchema, RoleResponseSchema
 from .schemas import TokenRefreshSchema, RefreshTokenSchema
 from .schemas import UserSchema, TokenSchema, LoginSchema
@@ -245,3 +245,25 @@ def get_all_users_ids(request):
         return 200, list(user_ids)
     except Exception as e:
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
+
+
+@user_router.post('/{user_id}/change-password', auth=jwt_auth,
+                  response={200: dict, 400: ErrorResponseSchema, 404: ErrorResponseSchema})
+def change_password(request, user_id: int, password_data: ChangePasswordSchema):
+    try:
+        user = User.objects.get(id=user_id)
+        if user.id != request.user.id:
+            return 400, {
+                "errors": [ErrorDetailSchema(field="user_id", message="You can only change your own password")]}
+
+        if not user.check_password(password_data.old_password):
+            return 400, {"errors": [ErrorDetailSchema(field="old_password", message="Incorrect old password")]}
+
+        user.set_password(password_data.new_password)
+        user.save()
+
+        return 200, {"message": "Password changed successfully"}
+    except User.DoesNotExist:
+        return 404, {"errors": [ErrorDetailSchema(field="user_id", message="User not found")]}
+    except Exception as e:
+        return 400, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}

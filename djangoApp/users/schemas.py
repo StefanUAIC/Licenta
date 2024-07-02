@@ -104,3 +104,20 @@ class UpdateProfileSchema(Schema):
     first_name: constr(min_length=1, max_length=30, pattern=r'^[a-zA-Z]*$')
     last_name: constr(min_length=1, max_length=30, pattern=r'^[a-zA-Z]*$')
     profile_picture: str | None
+
+
+class ChangePasswordSchema(Schema):
+    old_password: str
+    new_password: constr(min_length=8, max_length=30, pattern=r'^[a-zA-Z0-9_@$!%*?&]*$')
+
+    @field_validator('new_password')
+    def password_complexity(cls, v):
+        if not re.search(r'[A-Z]', v):
+            raise ValueError('Password must contain at least one uppercase letter')
+        if not re.search(r'[a-z]', v):
+            raise ValueError('Password must contain at least one lowercase letter')
+        if not re.search(r'[0-9]', v):
+            raise ValueError('Password must contain at least one digit')
+        if not re.search(r'[@$!%*?&]', v):
+            raise ValueError('Password must contain at least one special character')
+        return v
