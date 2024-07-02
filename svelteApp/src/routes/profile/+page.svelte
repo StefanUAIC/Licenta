@@ -11,7 +11,6 @@
 	let profilePromise: Promise<ProfileSchema & { rank: string; level: number; points: number }> | null = null;
 	let solutionsPromise: Promise<Solution[]> | null = null;
 	let user_id: number;
-	let loading = true;
 
 	const error: Writable<string | null> = writable(null);
 
@@ -43,8 +42,6 @@
 			console.error('Failed to load profile:', err);
 			error.set('Failed to load profile');
 			throw err;
-		} finally {
-			loading = false;
 		}
 	};
 
@@ -84,9 +81,6 @@
 
 <main>
 	<div class="container mx-auto my-24">
-		{#if loading}
-			<p class="text-center text-2xl">Loading profile...</p>
-		{/if}
 		{#await profilePromise}
 			<p class="text-center text-2xl">Loading profile...</p>
 		{:then profile}
