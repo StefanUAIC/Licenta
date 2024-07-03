@@ -5,12 +5,15 @@ from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
+from django.db.models import Prefetch
 from ninja import Router
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from classes.models import Class
 from classes.schemas import ClassResponseSchema
+from homeworks.models import Homework
+from homeworks.schemas import HomeworkDetailSchema
 from problems.schemas import ProblemSchema
 from solutions.models import Solution
 from solutions.schemas import SolutionSchema
@@ -222,9 +225,49 @@ def list_teacher_problems(request, user_id: int):
 @user_router.get('/{user_id}/solutions', auth=jwt_auth, response={200: List[SolutionSchema], 400: dict})
 def list_user_solutions(request, user_id: int):
     user = request.user
+    if user.id != user_id:
+        return 400, {"error": "You can only view your own solutions"}
 
-    solutions = Solution.objects.filter(user=user)
+    solutions = Solution.objects.filter(
+        user=user,
+        problem__status='ACCEPTED'
+    ).select_related('problem')
+
     return [SolutionSchema.from_orm(solution) for solution in solutions]
+
+
+@user_router.get('/{user_id}/homeworks', auth=jwt_auth,
+                 response={200: List[HomeworkDetailSchema], 400: dict, 403: dict, 404: dict})
+def list_student_homeworks(request, user_id: int):
+    user = request.user
+    if user.id != user_id:
+        return 400, {"error": "You can only view your own homeworks"}
+
+    if user.role != 'student':
+        return 403, {"error": "Only students can access this endpoint"}
+
+    try:
+        classes = Class.objects.filter(memberships__student=user).prefetch_related(
+            Prefetch('homeworks', queryset=Homework.objects.select_related('problem'), to_attr='class_homeworks')
+        )
+
+        all_homeworks = []
+        for class_instance in classes:
+            for homework in class_instance.class_homeworks:
+                all_homeworks.append(HomeworkDetailSchema(
+                    id=homework.id,
+                    class_instance_id=class_instance.id,
+                    problem_id=homework.problem.id,
+                    due_date=homework.due_date,
+                    class_instance_name=class_instance.name,
+                    problem_title=homework.problem.title
+                ))
+
+        return 200, all_homeworks
+    except User.DoesNotExist:
+        return 404, {"error": "User not found"}
+    except Exception as e:
+        return 400, {"error": str(e)}
 
 
 @user_router.get('/count/{role}', auth=jwt_auth, response={200: int, 400: ErrorResponseSchema})
