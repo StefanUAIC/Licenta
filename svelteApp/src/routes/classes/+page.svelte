@@ -17,9 +17,9 @@
 
 	let classesPaginationSettings = {
 		page: 0,
-		limit: 10,
+		limit: 5,
 		size: userClasses.length,
-		amounts: [1, 2, 3, 5, 10]
+		amounts: [1, 2, 3, 5]
 	} satisfies PaginationSettings;
 
 	let state = {
@@ -60,7 +60,7 @@
 
 			userClasses = await getUserClasses(user_id);
 			classesPaginationSettings.size = userClasses.length;
-			classesPaginationSettings.amounts = [1, 2, 3, 5, 10, userClasses.length];
+			classesPaginationSettings.amounts = [1, 2, 3, 5, userClasses.length];
 			classesPaginationSettings.amounts = classesPaginationSettings.amounts.filter((item, index) => classesPaginationSettings.amounts.indexOf(item) === index);
 			for (let classItem of userClasses) {
 				const students = await getClassStudents(classItem.id);
@@ -121,7 +121,7 @@
 </script>
 
 <template>
-	<div class="h-full flex flex-col items-center justify-center py-6">
+	<div class="h-full flex flex-col items-center justify-center py-6 bg-white">
 		<div class="flex flex-col sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6">
 			<div class="max-w-screen-lg sm:w-1/2 flex flex-col items-center p-8 rounded-lg">
 				{#if role === 'teacher'}
@@ -144,7 +144,7 @@
 						<thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white rounded-full">
 						<tr>
 							<th colspan="4"
-									class="px-6 py-6 text-xs font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md text-center">
+									class="px-6 py-6 text-lg font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md text-center">
 								{#if userName}Clasele {userName}{/if}
 							</th>
 						</tr>
@@ -160,13 +160,13 @@
 								</td>
 
 								<td
-									class="px-6 py-1 whitespace-nowrap class-name bg-white rounded-l-full cursor-pointer hover:highlight"
+									class="px-6 py-1 whitespace-nowrap class-name bg-gray-100 rounded-l-full cursor-pointer hover:highlight"
 									on:click={() => goToClass(classItem.id)}>
 									{classItem.name}
 								</td>
 
 								<td
-									class="px-6 py-4 whitespace-nowrap bg-white rounded-r-full text-right cursor-pointer hover:highlight"
+									class="px-6 py-4 whitespace-nowrap bg-gray-100 rounded-r-full text-right cursor-pointer hover:highlight"
 									on:click={() => goToClass(classItem.id)}> Număr de studenți: {classStudentCounts[classItem.id]}
 								</td>
 								{#if role === 'teacher'}
@@ -201,7 +201,7 @@
 					<Paginator bind:settings={classesPaginationSettings} on:page={onPageChange}
 										 on:amount={onAmountChange} showFirstLastButtons={state.firstLast}
 										 showPreviousNextButtons={state.previousNext} controlVariant="variant-soft bg-white"
-										 select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+										 select="variant-soft p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
 				</div>
 			</div>
 		</div>

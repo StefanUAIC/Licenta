@@ -15,7 +15,11 @@
 	import { type HomeworkDetail, type Solution } from '$lib/homeworks_api';
 	import CodeEditorViewSolution from './CodeEditorViewSolution.svelte';
 
-
+	const difficultyLabels: Record<string, string> = {
+		'easy': 'Ușor',
+		'medium': 'Mediu',
+		'hard': 'Dificil'
+	};
 	export let activeTab: string;
 	type DataType = (Solution & { problemTitle: string; difficulty: string }) | ProblemSchema | (ClassResponse & {
 		teacherName: string
@@ -152,18 +156,18 @@
 	let showSolutionModal = false;
 	let currentSolution: Solution & { problemTitle: string; difficulty: string } | null = null;
 
-    function isSolutionWithDetails(data: any): data is Solution & { problemTitle: string; difficulty: string } {
-        return 'percentage_passed' in data && 'problemTitle' in data && 'difficulty' in data;
-    }
+	function isSolutionWithDetails(data: any): data is Solution & { problemTitle: string; difficulty: string } {
+		return 'percentage_passed' in data && 'problemTitle' in data && 'difficulty' in data;
+	}
 
-    function openSolutionModal(row: any) {
-        if (isSolutionWithDetails(row)) {
-            currentSolution = row;
-            showSolutionModal = true;
-        } else {
-            console.error('Attempted to open solution modal with invalid data type');
-        }
-    }
+	function openSolutionModal(row: any) {
+		if (isSolutionWithDetails(row)) {
+			currentSolution = row;
+			showSolutionModal = true;
+		} else {
+			console.error('Attempted to open solution modal with invalid data type');
+		}
+	}
 
 	function closeSolutionModal() {
 		showSolutionModal = false;
@@ -222,26 +226,26 @@
 			<thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
 			<tr>
 				{#if activeTab === 'sentSolutions'}
-					<th class="px-6 py-3 text-center">Problem Title</th>
-					<th class="px-6 py-3 text-center">Difficulty</th>
-					<th class="px-6 py-3 text-center">Date Solved</th>
-					<th class="px-6 py-3 text-center">Score</th>
-					<th class="px-6 py-3 text-center">Actions</th>
+					<th class="px-6 py-3 text-center">Titlul Problemei</th>
+					<th class="px-6 py-3 text-center">Dificultate</th>
+					<th class="px-6 py-3 text-center">Data Rezolvării</th>
+					<th class="px-6 py-3 text-center">Punctaj</th>
+					<th class="px-6 py-3 text-center">Acțiuni</th>
 				{:else if activeTab === 'problemsProposed'}
-					<th class="px-6 py-3 text-center">Problem Title</th>
-					<th class="px-6 py-3 text-center">Difficulty</th>
-					<th class="px-6 py-3 text-center">Date Proposed</th>
+					<th class="px-6 py-3 text-center">Titlul Problemei</th>
+					<th class="px-6 py-3 text-center">Dificultate</th>
+					<th class="px-6 py-3 text-center">Data propunerii</th>
 					<th class="px-6 py-3 text-center">Status</th>
 				{:else if activeTab === 'myClasses'}
-					<th class="px-6 py-3 text-center">Class Name</th>
-					<th class="px-6 py-3 text-center">Tag</th>
-					<th class="px-6 py-3 text-center">Teacher</th>
-					<th class="px-6 py-3 text-center">Actions</th>
+					<th class="px-6 py-3 text-center">Numele clasei</th>
+					<th class="px-6 py-3 text-center">Etichetă</th>
+					<th class="px-6 py-3 text-center">Nume Profesor</th>
+					<th class="px-6 py-3 text-center">Acțiuni</th>
 				{:else if activeTab === 'myHomeworks'}
-					<th class="px-6 py-3 text-center">Problem Title</th>
-					<th class="px-6 py-3 text-center">Class Name</th>
-					<th class="px-6 py-3 text-center">Due Date</th>
-					<th class="px-6 py-3 text-center">Actions</th>
+					<th class="px-6 py-3 text-center">Titlul Problemei</th>
+					<th class="px-6 py-3 text-center">Numele clasei</th>
+					<th class="px-6 py-3 text-center">Dată limită</th>
+					<th class="px-6 py-3 text-center">Acțiuni</th>
 				{/if}
 			</tr>
 			</thead>
@@ -250,25 +254,27 @@
 				<tr class="rounded-md">
 					{#if activeTab === 'sentSolutions' && isSolution(row)}
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/problems/{row.problem_id}"
-																			   class="text-indigo-600 hover:text-indigo-900">{row.problemTitle}</a>
+																					   class="text-indigo-600 hover:text-indigo-900">{row.problemTitle}</a>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><span
-							class={getDifficultyColor(row.difficulty)}>{row.difficulty}</span></td>
+							class={getDifficultyColor(row.difficulty)}>{difficultyLabels[row.difficulty.toLowerCase()]}</span>
+						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{new Date(row.created_at).toLocaleDateString()}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><span
 							class={getScoreColor(row.percentage_passed)}>{row.percentage_passed}%</span></td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">
 							<button on:click={() => openSolutionModal(row)}
 									class="btn bg-solution-btn hover:bg-teal-700">
-								View Solution
+								Vizualizează Soluție
 							</button>
 						</td>
 					{:else if activeTab === 'problemsProposed' && isProblem(row)}
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/problems/{row.id}"
-																			   class="text-indigo-600 hover:text-indigo-900">{row.title}</a>
+																					   class="text-indigo-600 hover:text-indigo-900">{row.title}</a>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><span
-							class={getDifficultyColor(row.difficulty)}>{row.difficulty}</span></td>
+							class={getDifficultyColor(row.difficulty)}>{difficultyLabels[row.difficulty.toLowerCase()]}</span>
+						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{new Date(row.created_at).toLocaleDateString()}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">
                     <span
@@ -278,22 +284,21 @@
 						</td>
 					{:else if activeTab === 'myClasses' && isClass(row)}
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/classes/{row.id}"
-																			   class="text-indigo-600 hover:text-indigo-900">{row.name}</a>
+																					   class="text-indigo-600 hover:text-indigo-900">{row.name}</a>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{row.tag}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{row.teacherName}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/classes/{row.id}"
-																			   class="btn bg-solution-btn hover:bg-teal-700">View
-							Class</a></td>
+																					   class="btn bg-solution-btn hover:bg-teal-700">Vizualizează Clasă</a></td>
 					{:else if activeTab === 'myHomeworks' && isHomework(row)}
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/problems/{row.problem_id}"
-																			   class="text-indigo-600 hover:text-indigo-900">{row.problem_title}</a>
+																					   class="text-indigo-600 hover:text-indigo-900">{row.problem_title}</a>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{row.class_instance_name}</td>
 						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{new Date(row.due_date).toLocaleDateString()}</td>
-						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/classes/{row.class_instance_id}"
-																			   class="btn bg-solution-btn hover:bg-teal-700">View
-							Homework</a></td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a
+							href="/classes/{row.class_instance_id}"
+							class="btn bg-solution-btn hover:bg-teal-700">Vizualizează Temă</a></td>
 					{/if}
 				</tr>
 			{/each}

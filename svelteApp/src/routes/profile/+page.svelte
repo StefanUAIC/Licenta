@@ -18,10 +18,10 @@
 		const level = Math.floor(points / 10) + 1;
 
 		let rank;
-		if (points < 50) rank = 'Bronze';
-		else if (points < 100) rank = 'Silver';
-		else if (points < 200) rank = 'Gold';
-		else rank = 'Diamond';
+		if (points < 50) rank = 'Bronz';
+		else if (points < 100) rank = 'Argint';
+		else if (points < 200) rank = 'Aur';
+		else rank = 'Diamant';
 
 		return { rank, level, points };
 	}
@@ -76,13 +76,13 @@
 
 	function getRankColor(rank: string): string {
 		switch (rank) {
-			case 'Bronze':
+			case 'Bronz':
 				return 'text-amber-600';
-			case 'Silver':
+			case 'Argint':
 				return 'text-gray-400';
-			case 'Gold':
+			case 'Aur':
 				return 'text-yellow-400';
-			case 'Diamond':
+			case 'Diamant':
 				return 'text-blue-400';
 			default:
 				return 'text-gray-700';
@@ -116,10 +116,10 @@
 						<div class="w-1/2 flex flex-col justify-between">
 							<div>
 								<p class="text-xl mb-2"><span
-									class="font-semibold">Name:</span> {profile.first_name} {profile.last_name}</p>
+									class="font-semibold">Nume complet:</span> {profile.first_name} {profile.last_name}</p>
 								<p class="text-xl mb-4"><span class="font-semibold">Email:</span> {profile.email}</p>
 								<div class="mb-2">
-									<span class="text-2xl font-semibold mr-2">Level {profile.level}</span>
+									<span class="text-2xl font-semibold mr-2">Nivel {profile.level}</span>
 									<div class="w-full bg-gray-200 rounded-full h-4">
 										<div
 											class="bg-green-500 h-4 rounded-full"
@@ -127,21 +127,21 @@
 										></div>
 									</div>
 								</div>
-								<p class="text-lg">Experience: <span class="font-semibold">{profile.points}</span></p>
+								<p class="text-lg">Experientă: <span class="font-semibold">{profile.points}</span></p>
 							</div>
 							<div
 								class="text-center py-1 px-3 bg-indigo-100 rounded-lg text-indigo-800 text-xl font-semibold w-1/5">
-								{profile.role === 'teacher' ? '👨‍🏫 Teacher' : '👨‍🎓 Student'}
+								{profile.role === 'teacher' ? '👨‍🏫 Profesor' : '👨‍🎓 Student'}
 							</div>
 							<div class="flex mt-2 space-x-2">
 								<button class="btn flex items-center space-x-1 bg-indigo-custom" on:click={editProfile}>
 									<i class="fas fa-edit w-5 h-5"></i>
-									<span>Edit Profile</span>
+									<span>Editează Profil</span>
 								</button>
 								<button class="btn flex items-center space-x-1 bg-teal-custom"
 										on:click={changePassword}>
 									<i class="fas fa-key w-5 h-5"></i>
-									<span>Change Password</span>
+									<span>Schimbare Parolă</span>
 								</button>
 							</div>
 						</div>
@@ -182,23 +182,23 @@
 			<div class="nav-container mb-8">
 				<div class="flex space-x-4 mb-4">
 					<button class="cursor-pointer text-lg" class:active={$activeTab === 'sentSolutions'}
-							on:click={() => activeTab.set('sentSolutions')}>Sent Solutions
+							on:click={() => activeTab.set('sentSolutions')}>Soluții Trimise
 					</button>
 					{#await profilePromise}
 						<!-- Loading profile -->
 					{:then profile}
 						{#if profile && profile.role === 'teacher'}
 							<button class="cursor-pointer text-lg" class:active={$activeTab === 'problemsProposed'}
-									on:click={() => activeTab.set('problemsProposed')}>Problems Proposed
+									on:click={() => activeTab.set('problemsProposed')}>Probleme Propuse
 							</button>
 						{:else}
 							<button class="cursor-pointer text-lg" class:active={$activeTab === 'myHomeworks'}
-									on:click={() => activeTab.set('myHomeworks')}>My Homeworks
+									on:click={() => activeTab.set('myHomeworks')}>Temele mele
 							</button>
 						{/if}
 					{/await}
 					<button class="cursor-pointer text-lg" class:active={$activeTab === 'myClasses'}
-							on:click={() => activeTab.set('myClasses')}>My Classes
+							on:click={() => activeTab.set('myClasses')}>Clasele mele
 					</button>
 				</div>
 			</div>

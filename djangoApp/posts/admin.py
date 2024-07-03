@@ -14,7 +14,7 @@ class PostAdmin(admin.ModelAdmin):
         for post in queryset:
             post.status = 'ACCEPTED'
             post.save()
-            message = f'Your post "{post.title}" has been accepted.'
+            message = f'Postarea ta "{post.title}" a fost acceptată.'
 
     accept_posts.short_description = 'Accept selected posts'
 
@@ -22,6 +22,6 @@ class PostAdmin(admin.ModelAdmin):
         for post in queryset:
             post.status = 'REJECTED'
             post.save()
-            message = f'Your post "{post.title}" has been rejected.'
+            message = f'Postarea ta "{post.title}" a fost respinsă.'
 
     reject_posts.short_description = 'Reject selected posts'

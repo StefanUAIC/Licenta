@@ -14,6 +14,33 @@
 	import CodeEditor from '../../../components/CodeEditor.svelte';
 	import Waves_4 from '../../../components/Waves_4.svelte';
 
+	const difficultyLabels: Record<string, string> = { 'easy': 'Ușor', 'medium': 'Mediu', 'hard': 'Dificil' };
+	const gradeLabels: Record<number, string> = {
+		9: 'a 9-a',
+		10: 'a 10-a',
+		11: 'a 11-a',
+		12: 'a 12-a'
+	};
+	const categoryLabels: Record<string, string> = {
+		'arrays': 'Vectori',
+		'linked_lists': 'Liste Înlănțuite',
+		'sorting': 'Sortare',
+		'searching': 'Căutare',
+		'trees': 'Arbori',
+		'graphs': 'Grafuri',
+		'dynamic_programming': 'Programare Dinamică',
+		'recursion': 'Recursivitate',
+		'backtracking': 'Backtracking',
+		'bit_manipulation': 'Manipulare de Biți',
+		'greedy': 'Algoritmi Greedy',
+		'math': 'Matematică',
+		'geometry': 'Geometrie',
+		'combinatorics': 'Combinatorică',
+		'probability': 'Probabilitate',
+		'game_theory': 'Teoria Jocurilor',
+		'puzzles': 'Puzzle-uri',
+		'miscellaneous': 'Diverse'
+	};
 
 	const problem = writable<ProblemSchema | null>(null);
 	const error = writable<string | null>(null);
@@ -121,33 +148,6 @@
 		}
 	}
 
-	function toRomanNumeral(num: number): string {
-		const romanNumerals = [
-			{ value: 1000, numeral: 'M' },
-			{ value: 900, numeral: 'CM' },
-			{ value: 500, numeral: 'D' },
-			{ value: 400, numeral: 'CD' },
-			{ value: 100, numeral: 'C' },
-			{ value: 90, numeral: 'XC' },
-			{ value: 50, numeral: 'L' },
-			{ value: 40, numeral: 'XL' },
-			{ value: 10, numeral: 'X' },
-			{ value: 9, numeral: 'IX' },
-			{ value: 5, numeral: 'V' },
-			{ value: 4, numeral: 'IV' },
-			{ value: 1, numeral: 'I' }
-		];
-
-		let result = '';
-		for (let i = 0; i < romanNumerals.length; i++) {
-			while (num >= romanNumerals[i].value) {
-				result += romanNumerals[i].numeral;
-				num -= romanNumerals[i].value;
-			}
-		}
-		return result;
-	}
-
 	function getTestCaseColor(passed: boolean): string {
 		return passed
 			? 'bg-green-200 text-green-800'
@@ -176,46 +176,45 @@
 		{#if $problem}
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
 				<div class="bg-white p-6 rounded-lg shadow-md">
-					<!--                    <h1 class="text-4xl font-bold mb-8 text-center">{$problem.title}</h1>-->
-
 					<div class="flex justify-center items-center space-x-6 mb-8 text-xl">
 						<span
 							class={`px-4 py-2 rounded-full text-white text-xl ${getDifficultyColor($problem.difficulty)}`}>
-							{$problem.difficulty}
+							{difficultyLabels[$problem.difficulty.toLowerCase()]}
 						</span>
-						<span class="font-bold">Grade: <span
-							class="text-2xl">{toRomanNumeral($problem.grade)}</span></span>
-						<span class="font-bold">Category: <span class="text-2xl">{$problem.category}</span></span>
+						<span class="font-bold">Clasă: <span
+							class="text-2xl">{gradeLabels[$problem.grade]}</span></span>
+						<span class="font-bold">Categorie: <span
+							class="text-2xl">{categoryLabels[$problem.category]}</span></span>
 					</div>
 
 					<p class="text-gray-700 mb-10 text-xl">{$problem.description}</p>
 
 					<div class="mb-10">
-						<h2 class="text-2xl font-semibold mb-4">Restrictions:</h2>
+						<h2 class="text-2xl font-semibold mb-4">Restricții:</h2>
 						<p class="text-lg">{$problem.restrictions}</p>
 					</div>
 
 					<div class="mb-10">
-						<h2 class="text-2xl font-semibold mb-4">Example Input</h2>
+						<h2 class="text-2xl font-semibold mb-4">Exemplu de Intrare</h2>
 						<pre class="bg-gray-200 p-4 rounded text-lg">{$problem.example_input}</pre>
 					</div>
 
 					<div class="mb-10">
-						<h2 class="text-2xl font-semibold mb-4">Example Output</h2>
+						<h2 class="text-2xl font-semibold mb-4">Exemplu de Ieșire</h2>
 						<pre class="bg-gray-200 p-4 rounded text-lg">{$problem.example_output}</pre>
 					</div>
 
 					<div class="flex justify-between text-lg">
-						<span><strong>Time Limit:</strong> {$problem.time_limit} seconds</span>
-						<span><strong>Memory Limit:</strong> {$problem.memory_limit} KB</span>
+						<span><strong>Limită de timp:</strong> {$problem.time_limit} secunde</span>
+						<span><strong>Limită de memorie:</strong> {$problem.memory_limit} KB</span>
 					</div>
 				</div>
 
 				<div>
 					<div class="bg-white p-6 rounded-lg shadow-md mb-6">
 						<div class="mb-4">
-							<label for="language" class="block text-lg font-medium text-gray-700 mb-2">Select
-								Language</label>
+							<label for="language" class="block text-lg font-medium text-gray-700 mb-2">Selectează
+								Limbajul</label>
 							<select id="language" class="block w-full p-2 border border-gray-300 rounded-lg"
 									bind:value={$language_id}>
 								{#each $languages as language}
@@ -225,11 +224,11 @@
 						</div>
 
 						<div class="mb-4">
-							<label for="homework" class="block text-lg font-medium text-gray-700 mb-2">Select
-								Homework</label>
+							<label for="homework" class="block text-lg font-medium text-gray-700 mb-2">Selectează
+								Tema</label>
 							<select id="homework" class="block w-full p-2 border border-gray-300 rounded-lg"
 									bind:value={$selectedHomeworkId}>
-								<option value={null}>None</option>
+								<option value={null}>Niciuna</option>
 								{#each $homeworks as homework}
 									<option value={homework.id}>{homework.problem_title}
 										- {homework.class_instance_name}</option>
@@ -239,29 +238,20 @@
 						{#if $submissionError}
 							<p class="text-red-500 mt-2">{$submissionError}</p>
 						{/if}
-						<CodeEditor bind:code={source_code} />
+						<CodeEditor bind:code={source_code} bind:languageId={$language_id} />
 						<button class="btn bg-indigo-600 bg-opacity-80 mt-4 w-full text-white"
 								on:click={submitCodeHandler}>
-							Submit Code
+							Trimite Codul
 						</button>
-
-						<!--                        <button-->
-						<!--                                type="button"-->
-						<!--                                class="w-full px-4 py-2 mt-4 text-lg rounded-md bg-indigo-200 text-indigo-800 hover:bg-indigo-300 transition-colors border border-indigo-400"-->
-						<!--                                on:click={submitCodeHandler}-->
-						<!--                        >-->
-						<!--                            Submit Code-->
-						<!--                        </button>-->
-
 						{#if $loading}
-							<p class="text-blue-500 mt-4">Loading...</p>
+							<p class="text-blue-500 mt-4">Se încarcă...</p>
 						{/if}
 					</div>
 
 					{#if $result && $result.length > 0}
 						<div class="bg-white p-6 rounded-lg shadow-md">
-							<h2 class="text-2xl font-semibold mb-4">Test Results</h2>
-							<p class="mb-4 text-lg">Passed Test Cases: {$passedCount} / {$result.length}</p>
+							<h2 class="text-2xl font-semibold mb-4">Rezultatele Testelor</h2>
+							<p class="mb-4 text-lg">Teste Trecute: {$passedCount} / {$result.length}</p>
 
 							<div class="flex flex-wrap gap-2 mb-4">
 								{#each $result as testCase, index}
@@ -275,16 +265,16 @@
 
 							{#if $activeTestCase !== null}
 								<div class="mt-4 p-4 bg-gray-100 rounded-lg">
-									<h3 class="text-xl font-semibold mb-2">Test Case {$activeTestCase + 1} Details</h3>
-									<p><strong>Status:</strong> {$result[$activeTestCase].passed ? 'Passed' : 'Failed'}
+									<h3 class="text-xl font-semibold mb-2">Detalii Test {$activeTestCase + 1}</h3>
+									<p><strong>Status:</strong> {$result[$activeTestCase].passed ? 'Trecut' : 'Eșuat'}
 									</p>
-									<p><strong>Your Output:</strong></p>
+									<p><strong>Ieșirea ta:</strong></p>
 									<pre
-										class="bg-white p-2 rounded mt-1 mb-2 whitespace-pre-wrap">{$result[$activeTestCase].actual_output || 'No output available'}</pre>
+										class="bg-white p-2 rounded mt-1 mb-2 whitespace-pre-wrap">{$result[$activeTestCase].actual_output || 'Nu există ieșire disponibilă'}</pre>
 									{#if !$result[$activeTestCase].passed}
-										<p><strong>Error Message:</strong></p>
+										<p><strong>Mesaj de eroare:</strong></p>
 										<pre
-											class="bg-red-100 text-red-800 p-2 rounded mt-1 whitespace-pre-wrap">{$result[$activeTestCase].status || 'No error message available'}</pre>
+											class="bg-red-100 text-red-800 p-2 rounded mt-1 whitespace-pre-wrap">{$result[$activeTestCase].status || 'Nu există mesaj de eroare disponibil'}</pre>
 									{/if}
 								</div>
 							{/if}

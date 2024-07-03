@@ -14,7 +14,7 @@ class ProblemAdmin(admin.ModelAdmin):
         for problem in queryset:
             problem.status = 'ACCEPTED'
             problem.save()
-            message = f'Your problem "{problem.title}" has been accepted.'
+            message = f'Problema ta "{problem.title}" a fost acceptată.'
 
     accept_problems.short_description = 'Accept selected problems'
 
@@ -22,7 +22,7 @@ class ProblemAdmin(admin.ModelAdmin):
         for problem in queryset:
             problem.status = 'REJECTED'
             problem.save()
-            message = f'Your problem "{problem.title}" has been rejected.'
+            message = f'Problema ta "{problem.title}" a fost respinsă.'
 
     reject_problems.short_description = 'Reject selected problems'
 

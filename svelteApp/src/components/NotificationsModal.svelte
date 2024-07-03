@@ -47,7 +47,7 @@
 					<div class="flex justify-between items-center bg-yellow-200 p-3 mb-2 rounded">
 						<p>{notification.message}</p>
 						<button class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-700" on:click={() => handleMarkAsRead(notification.id)}>
-							Mark as read
+							Marchează ca citit
 						</button>
 					</div>
 				{/each}

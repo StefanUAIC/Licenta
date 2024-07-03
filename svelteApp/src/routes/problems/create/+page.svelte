@@ -404,17 +404,17 @@
 											Test {$selectedTestCase + 1}:
 											<span
 												class={$verificationResults[$selectedTestCase].passed ? "text-green-600" : "text-red-600"}>
-							{$verificationResults[$selectedTestCase].passed ? 'Passed' : 'Failed'}
+							{$verificationResults[$selectedTestCase].passed ? 'Aprobat' : 'Respins'}
 						</span>
 										</h4>
 										<p><strong>Status:</strong> {$verificationResults[$selectedTestCase].status}</p>
 										<div class="mt-2">
-											<p><strong>Expected Output:</strong></p>
+											<p><strong>Date așteptate de Ieșire:</strong></p>
 											<pre
 												class="bg-gray-100 p-2 rounded mt-1 mb-2 whitespace-pre-wrap">{$verificationResults[$selectedTestCase].expected_output}</pre>
 										</div>
 										<div class="mt-2">
-											<p><strong>Actual Output:</strong></p>
+											<p><strong>Date reale de ieșire:</strong></p>
 											<pre
 												class="bg-gray-100 p-2 rounded mt-1 whitespace-pre-wrap">{$verificationResults[$selectedTestCase].actual_output}</pre>
 										</div>

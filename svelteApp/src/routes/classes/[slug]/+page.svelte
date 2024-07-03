@@ -248,7 +248,7 @@
 							<thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white rounded-full">
 							<tr>
 								<th colspan="2"
-									class="px-6 py-6 text-xs font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md text-center">
+									class="px-6 py-6 text-lg font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md text-center">
 									Teme
 								</th>
 							</tr>
