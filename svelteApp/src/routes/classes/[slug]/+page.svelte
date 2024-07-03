@@ -210,9 +210,11 @@
 
 
 	function openCodeEditor(submission: Solution) {
-		currentSubmissionCode = submission.code;
-		currentSubmissionLanguageId = submission.language_id;
-		showCodeEditor = true;
+		if (role === 'teacher') {
+			currentSubmissionCode = submission.code;
+			currentSubmissionLanguageId = submission.language_id;
+			showCodeEditor = true;
+		}
 	}
 
 	function closeCodeEditor() {
@@ -311,8 +313,9 @@
 									<td class="px-6 py-1 min-h-[50px] whitespace-nowrap flex space-x-2 text-center">
 										{#each currentSubmissions.filter(submission => submission.user_id) as submission}
 											<button
-												class={`py-1 px-3 rounded ${getButtonColor(submission.percentage_passed)}`}
-												on:click={() => openCodeEditor(submission)}>
+												class={`py-1 px-3 rounded ${getButtonColor(submission.percentage_passed)} ${role !== 'teacher' ? 'cursor-not-allowed opacity-80' : ''}`}
+												on:click={() => openCodeEditor(submission)}
+												disabled={role !== 'teacher'}>
 												{submission.percentage_passed}%
 											</button>
 										{/each}
@@ -358,22 +361,22 @@
 		</div>
 	</Modal>
 
-	{#if showCodeEditor}
-		<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-			<div class="bg-white p-6 rounded-lg shadow-xl w-3/4 h-3/4 flex flex-col">
-				<h2 class="text-2xl font-bold mb-4">Solution Code</h2>
-				<div class="flex-grow overflow-hidden">
-					<CodeEditorViewSolution code={currentSubmissionCode} languageId={currentSubmissionLanguageId} />
-				</div>
-				<div class="mt-4 flex justify-end">
-					<button on:click={closeCodeEditor}
-							class="btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-						Close
-					</button>
-				</div>
-			</div>
-		</div>
-	{/if}
+    {#if showCodeEditor}
+        <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl w-3/4 h-3/4 flex flex-col">
+                <h2 class="text-2xl font-bold mb-4">Solution Code</h2>
+                <div class="flex-grow overflow-hidden">
+                    <CodeEditorViewSolution code={currentSubmissionCode} languageId={currentSubmissionLanguageId} />
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button on:click={closeCodeEditor}
+                        class="btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
 </template>
 
 <style>
