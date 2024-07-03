@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getAuthHeaders } from '$lib/utils';
 import type { RoleResponse } from '$lib/auth_api';
 import type { ClassResponse } from '$lib/classes_api';
-import type { Solution } from '$lib/homeworks_api';
+import type { HomeworkDetail, Solution } from '$lib/homeworks_api';
 import type { ProblemSchema } from '$lib/problems_api';
 
 const API_USERS_URL = import.meta.env.VITE_API_USERS_URL;
@@ -94,6 +94,20 @@ export const getUserSolutions = async (user_id: number): Promise<Solution[]> => 
 			throw new Error('An unexpected error occurred');
 		}
 	}
+};
+
+export const getAllUserHomeworks = async (user_id: number): Promise<HomeworkDetail[]> => {
+    try {
+        const response = await axios.get<HomeworkDetail[]>(`${API_USERS_URL}/${user_id}/homeworks`, getAuthHeaders());
+        return response.data;
+    } catch (error) {
+        if (axios.isAxiosError(error) && error.response) {
+            console.log(error.response.data.errors);
+            throw error.response.data.errors;
+        } else {
+            throw new Error('An unexpected error occurred');
+        }
+    }
 };
 
 export const getTeacherProblems = async (user_id: number): Promise<ProblemSchema[]> => {

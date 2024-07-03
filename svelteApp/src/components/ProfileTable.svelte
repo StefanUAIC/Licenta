@@ -1,85 +1,175 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { writable } from 'svelte/store';
 	import { type PaginationSettings, Paginator } from '@skeletonlabs/skeleton';
-	import { faker } from '@faker-js/faker';
+	import {
+		getAllUserHomeworks,
+		getProfile,
+		getTeacherProblems,
+		getUserClasses,
+		getUserSolutions
+	} from '$lib/users_api';
+	import { getCookie, getUserIDFromJWT } from '$lib/utils';
+	import { getProblemById, type ProblemSchema } from '$lib/problems_api';
+	import type { ClassResponse } from '$lib/classes_api';
+	import { type HomeworkDetail, type Solution } from '$lib/homeworks_api';
+	import CodeEditorViewSolution from './CodeEditorViewSolution.svelte';
+
 
 	export let activeTab: string;
+	type DataType = (Solution & { problemTitle: string; difficulty: string }) | ProblemSchema | (ClassResponse & {
+		teacherName: string
+	}) | HomeworkDetail;
 
-	const sourceHeaders: string[] = ['', 'Problem Name', 'Difficulty', 'Date Solved', 'Score', 'Solutions'];
-	const problemsHeaders: string[] = ['', 'Problem Name', 'Difficulty', 'Date Proposed', 'Status'];
-	const classesHeaders: string[] = ['', 'Class Name', 'Date Joined', 'Instructor'];
+	function isSolution(data: DataType): data is Solution & { problemTitle: string; difficulty: string } {
+		return 'percentage_passed' in data;
+	}
 
-	const sourceBody = Array(27).fill(undefined).map((_, index) => [
-		index + 1,
-		faker.hacker.phrase(),
-		['Easy', 'Medium', 'Hard'][Math.floor(Math.random() * 3)],
-		faker.date.past().toLocaleDateString(),
-		Math.floor(Math.random() * 101),
-		faker.string.uuid()
-	]);
+	function isProblem(data: DataType): data is ProblemSchema {
+		return 'title' in data && 'difficulty' in data;
+	}
 
-	const problemsBody = Array(15).fill(undefined).map((_, index) => [
-		index + 1,
-		faker.hacker.phrase(),
-		['Easy', 'Medium', 'Hard'][Math.floor(Math.random() * 3)],
-		faker.date.past().toLocaleDateString(),
-		['Pending', 'Approved', 'Rejected'][Math.floor(Math.random() * 3)]
-	]);
+	function isClass(data: DataType): data is ClassResponse & { teacherName: string } {
+		return 'teacherName' in data;
+	}
 
-	const classesBody = Array(10).fill(undefined).map((_, index) => [
-		index + 1,
-		`${faker.word.adjective()} Class`,
-		faker.date.past().toLocaleDateString(),
-		faker.person.fullName()
-	]);
+	function isHomework(data: DataType): data is HomeworkDetail {
+		return 'problem_title' in data && 'class_instance_name' in data;
+	}
 
-	let paginationSettings = {
+	const classesStore = writable<(ClassResponse & { teacherName: string })[]>([]);
+	const problemsStore = writable<ProblemSchema[]>([]);
+	const solutionsStore = writable<(Solution & { problemTitle: string, difficulty: string })[]>([]);
+	const homeworksStore = writable<HomeworkDetail[]>([]);
+
+	let classes: (ClassResponse & { teacherName: string })[] = [];
+	let problems: ProblemSchema[] = [];
+	let solutions: (Solution & { problemTitle: string, difficulty: string })[] = [];
+	let homeworks: HomeworkDetail[] = [];
+	let isLoading: boolean = true;
+	let error: string | null = null;
+
+	let paginationSettings: PaginationSettings = {
 		page: 0,
-		limit: 3,
-		size: sourceBody.length,
-		amounts: [1, 2, 3, 5, sourceBody.length]
-	} satisfies PaginationSettings;
-
-	let problemsPaginationSettings = {
-		page: 0,
-		limit: 3,
-		size: problemsBody.length,
-		amounts: [1, 2, 3, 5, problemsBody.length]
-	} satisfies PaginationSettings;
-
-	let classesPaginationSettings = {
-		page: 0,
-		limit: 3,
-		size: classesBody.length,
-		amounts: [1, 2, 3, 5, classesBody.length]
-	} satisfies PaginationSettings;
-
-	let state = {
-		firstLast: false,
-		previousNext: true
+		limit: 5,
+		size: 0,
+		amounts: [5, 10, 25, 50]
 	};
 
-	function onPageChange(e: CustomEvent): void {
-		console.log('Paginator - event:page', e.detail);
+	onMount(async () => {
+		await fetchTabData(activeTab);
+	});
+
+	async function fetchTabData(tab: string) {
+		isLoading = true;
+		error = null;
+		try {
+			let access_token = getCookie('access');
+			const userId = getUserIDFromJWT(access_token);
+
+			switch (tab) {
+				case 'sentSolutions':
+					solutionsStore.subscribe(value => solutions = value);
+					if (solutions.length === 0) {
+						const rawSolutions = await getUserSolutions(userId);
+						solutions = await Promise.all(rawSolutions.map(async (solution) => {
+							const problem = await getProblemById(solution.problem_id);
+							return {
+								...solution,
+								problemTitle: problem.title,
+								difficulty: problem.difficulty
+							};
+						}));
+						solutionsStore.set(solutions);
+					}
+					break;
+				case 'problemsProposed':
+					problemsStore.subscribe(value => problems = value);
+					if (problems.length === 0) {
+						problems = await getTeacherProblems(userId);
+						problemsStore.set(problems);
+					}
+					break;
+				case 'myClasses':
+					classesStore.subscribe(value => classes = value);
+					if (classes.length === 0) {
+						const rawClasses = await getUserClasses(userId);
+						classes = await Promise.all(rawClasses.map(async (classItem) => {
+							const teacherProfile = await getProfile(classItem.teacher_id);
+							return {
+								...classItem,
+								teacherName: `${teacherProfile.first_name} ${teacherProfile.last_name}`
+							};
+						}));
+						classesStore.set(classes);
+					}
+					break;
+				case 'myHomeworks':
+					homeworksStore.subscribe(value => homeworks = value);
+					if (homeworks.length === 0) {
+						homeworks = await getAllUserHomeworks(userId);
+						homeworksStore.set(homeworks);
+					}
+					break;
+			}
+			paginationSettings.page = 0;
+		} catch (err: any) {
+			console.error(err);
+			error = err.message || 'An unexpected error occurred';
+		} finally {
+			isLoading = false;
+		}
 	}
 
-	function onAmountChange(e: CustomEvent): void {
-		console.log('Paginator - event:amount', e.detail);
+	$: {
+		if (activeTab) {
+			fetchTabData(activeTab);
+		}
 	}
 
-	$: sourceBodySliced = sourceBody.slice(
+	$: currentData = (() => {
+		switch (activeTab) {
+			case 'sentSolutions':
+				return solutions;
+			case 'problemsProposed':
+				return problems;
+			case 'myClasses':
+				return classes;
+			case 'myHomeworks':
+				return homeworks;
+			default:
+				return [];
+		}
+	})();
+
+	$: paginationSettings.size = currentData.length;
+
+	$: paginatedData = currentData.slice(
 		paginationSettings.page * paginationSettings.limit,
 		paginationSettings.page * paginationSettings.limit + paginationSettings.limit
 	);
 
-	$: problemsBodySliced = problemsBody.slice(
-		problemsPaginationSettings.page * problemsPaginationSettings.limit,
-		problemsPaginationSettings.page * problemsPaginationSettings.limit + problemsPaginationSettings.limit
-	);
+	let showSolutionModal = false;
+	let currentSolution: Solution & { problemTitle: string; difficulty: string } | null = null;
 
-	$: classesBodySliced = classesBody.slice(
-		classesPaginationSettings.page * classesPaginationSettings.limit,
-		classesPaginationSettings.page * classesPaginationSettings.limit + classesPaginationSettings.limit
-	);
+    function isSolutionWithDetails(data: any): data is Solution & { problemTitle: string; difficulty: string } {
+        return 'percentage_passed' in data && 'problemTitle' in data && 'difficulty' in data;
+    }
+
+    function openSolutionModal(row: any) {
+        if (isSolutionWithDetails(row)) {
+            currentSolution = row;
+            showSolutionModal = true;
+        } else {
+            console.error('Attempted to open solution modal with invalid data type');
+        }
+    }
+
+	function closeSolutionModal() {
+		showSolutionModal = false;
+		currentSolution = null;
+	}
+
 
 	function getDifficultyColor(difficulty: string): string {
 		switch (difficulty) {
@@ -103,146 +193,141 @@
 			return 'font-bold text-green-500';
 		}
 	}
+
+	function getEmptyMessage(tab: string): string {
+		switch (tab) {
+			case 'sentSolutions':
+				return 'You haven\'t submitted any solutions yet.';
+			case 'problemsProposed':
+				return 'You haven\'t proposed any problems yet.';
+			case 'myClasses':
+				return 'You\'re not enrolled in any classes yet.';
+			case 'myHomeworks':
+				return 'You haven\'t received any homeworks yet.';
+			default:
+				return 'No data available.';
+		}
+	}
 </script>
 
 <div class="w-full space-y-4 text-token mt-4">
-	{#if activeTab === 'sentSolutions'}
+	{#if isLoading}
+		<p>Loading...</p>
+	{:else if error}
+		<p class="text-red-500">{error}</p>
+	{:else if paginatedData.length === 0}
+		<p class="text-center text-gray-500 my-8">{getEmptyMessage(activeTab)}</p>
+	{:else}
 		<table class="min-w-full divide-y divide-gray-200 shadow-lg">
 			<thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
 			<tr>
-				{#each sourceHeaders as header}
-					<th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md">{header}</th>
-				{/each}
+				{#if activeTab === 'sentSolutions'}
+					<th class="px-6 py-3 text-center">Problem Title</th>
+					<th class="px-6 py-3 text-center">Difficulty</th>
+					<th class="px-6 py-3 text-center">Date Solved</th>
+					<th class="px-6 py-3 text-center">Score</th>
+					<th class="px-6 py-3 text-center">Actions</th>
+				{:else if activeTab === 'problemsProposed'}
+					<th class="px-6 py-3 text-center">Problem Title</th>
+					<th class="px-6 py-3 text-center">Difficulty</th>
+					<th class="px-6 py-3 text-center">Date Proposed</th>
+					<th class="px-6 py-3 text-center">Status</th>
+				{:else if activeTab === 'myClasses'}
+					<th class="px-6 py-3 text-center">Class Name</th>
+					<th class="px-6 py-3 text-center">Tag</th>
+					<th class="px-6 py-3 text-center">Teacher</th>
+					<th class="px-6 py-3 text-center">Actions</th>
+				{:else if activeTab === 'myHomeworks'}
+					<th class="px-6 py-3 text-center">Problem Title</th>
+					<th class="px-6 py-3 text-center">Class Name</th>
+					<th class="px-6 py-3 text-center">Due Date</th>
+					<th class="px-6 py-3 text-center">Actions</th>
+				{/if}
 			</tr>
 			</thead>
 			<tbody class="bg-white divide-y divide-gray-200">
-			{#each sourceBodySliced as row}
+			{#each paginatedData as row}
 				<tr class="rounded-md">
-					{#each row as cell, index}
-						<td class="px-6 py-4 whitespace-nowrap {index === 0 ? 'rounded-l-md' : ''} {index === row.length - 1 ? 'rounded-r-md' : ''}">
-							{#if index === 1}
-								<a href="/problem/{cell}" class="text-indigo-600 hover:text-indigo-900">{cell}</a>
-							{:else if index === 2}
-								{#if typeof cell === 'string'}
-									<span class={getDifficultyColor(cell)}>{cell}</span>
-								{:else}
-									{cell}
-								{/if}
-							{:else if index === 4}
-								{#if typeof cell === 'number'}
-									<span class={getScoreColor(cell)}>{cell}</span>
-								{:else}
-									{cell}
-								{/if}
-							{:else if index === 5}
-								<a href="/solution/{cell}" class="btn bg-solution-btn hover:bg-teal-700">View
-									Solution</a>
-							{:else}
-								{cell}
-							{/if}
+					{#if activeTab === 'sentSolutions' && isSolution(row)}
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/problems/{row.problem_id}"
+																			   class="text-indigo-600 hover:text-indigo-900">{row.problemTitle}</a>
 						</td>
-					{/each}
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><span
+							class={getDifficultyColor(row.difficulty)}>{row.difficulty}</span></td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{new Date(row.created_at).toLocaleDateString()}</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><span
+							class={getScoreColor(row.percentage_passed)}>{row.percentage_passed}%</span></td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">
+							<button on:click={() => openSolutionModal(row)}
+									class="btn bg-solution-btn hover:bg-teal-700">
+								View Solution
+							</button>
+						</td>
+					{:else if activeTab === 'problemsProposed' && isProblem(row)}
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/problems/{row.id}"
+																			   class="text-indigo-600 hover:text-indigo-900">{row.title}</a>
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><span
+							class={getDifficultyColor(row.difficulty)}>{row.difficulty}</span></td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{new Date(row.created_at).toLocaleDateString()}</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">
+                    <span
+						class={row.status === 'Pending' ? 'text-yellow-500 text-lg' : row.status === 'Approved' ? 'text-green-500 text-lg' : 'text-red-500 text-lg'}>
+                        {row.status}
+                    </span>
+						</td>
+					{:else if activeTab === 'myClasses' && isClass(row)}
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/classes/{row.id}"
+																			   class="text-indigo-600 hover:text-indigo-900">{row.name}</a>
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{row.tag}</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{row.teacherName}</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/classes/{row.id}"
+																			   class="btn bg-solution-btn hover:bg-teal-700">View
+							Class</a></td>
+					{:else if activeTab === 'myHomeworks' && isHomework(row)}
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/problems/{row.problem_id}"
+																			   class="text-indigo-600 hover:text-indigo-900">{row.problem_title}</a>
+						</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{row.class_instance_name}</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg">{new Date(row.due_date).toLocaleDateString()}</td>
+						<td class="px-6 py-4 whitespace-nowrap text-center text-lg"><a href="/classes/{row.class_instance_id}"
+																			   class="btn bg-solution-btn hover:bg-teal-700">View
+							Homework</a></td>
+					{/if}
 				</tr>
 			{/each}
 			</tbody>
 		</table>
-		<Paginator bind:settings={paginationSettings} on:page={onPageChange} on:amount={onAmountChange}
-				   showFirstLastButtons={state.firstLast} showPreviousNextButtons={state.previousNext}
-				   controlVariant="variant-soft bg-white"
-				   select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
-	{:else if activeTab === 'problemsProposed'}
-		<table class="min-w-full divide-y divide-gray-200 shadow-lg">
-			<thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
-			<tr>
-				{#each problemsHeaders as header}
-					<th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md">{header}</th>
-				{/each}
-			</tr>
-			</thead>
-			<tbody class="bg-white divide-y divide-gray-200">
-			{#each problemsBodySliced as row}
-				<tr class="rounded-md">
-					{#each row as cell, index}
-						<td class="px-6 py-4 whitespace-nowrap {index === 0 ? 'rounded-l-md' : ''} {index === row.length - 1 ? 'rounded-r-md' : ''}">
-							{#if index === 1}
-								<a href="/problem/{cell}" class="text-indigo-600 hover:text-indigo-900">{cell}</a>
-							{:else if index === 2}
-								{#if typeof cell === 'string'}
-									<span class={getDifficultyColor(cell)}>{cell}</span>
-								{:else}
-									{cell}
-								{/if}
-							{:else if index === 4}
-								<span
-									class={cell === 'Pending' ? 'text-yellow-500' : cell === 'Approved' ? 'text-green-500' : 'text-red-500'}>{cell}</span>
-							{:else}
-								{cell}
-							{/if}
-						</td>
-					{/each}
-				</tr>
-			{/each}
-			</tbody>
-		</table>
-		<Paginator bind:settings={problemsPaginationSettings} on:page={onPageChange} on:amount={onAmountChange}
-				   showFirstLastButtons={state.firstLast} showPreviousNextButtons={state.previousNext}
-				   controlVariant="variant-soft bg-white"
-				   select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
-	{:else if activeTab === 'myClasses'}
-		<table class="min-w-full divide-y divide-gray-200 shadow-lg">
-			<thead class="bg-gradient-to-tr from-teal-300 to-indigo-600 text-white">
-			<tr>
-				{#each classesHeaders as header}
-					<th class="px-6 py-4 text-left text-xs font-medium uppercase tracking-wider first:rounded-tl-md last:rounded-tr-md">{header}</th>
-				{/each}
-			</tr>
-			</thead>
-			<tbody class="bg-white divide-y divide-gray-200">
-			{#each classesBodySliced as row}
-				<tr class="rounded-md">
-					{#each row as cell, index}
-						<td class="px-6 py-4 whitespace-nowrap {index === 0 ? 'rounded-l-md' : ''} {index === row.length - 1 ? 'rounded-r-md' : ''}">
-							{#if index === 1}
-								<a href="/class/{cell}" class="text-indigo-600 hover:text-indigo-900">{cell}</a>
-							{:else}
-								{cell}
-							{/if}
-						</td>
-					{/each}
-				</tr>
-			{/each}
-			</tbody>
-		</table>
-		<Paginator bind:settings={classesPaginationSettings} on:page={onPageChange} on:amount={onAmountChange}
-				   showFirstLastButtons={state.firstLast} showPreviousNextButtons={state.previousNext}
-				   controlVariant="variant-soft bg-white"
-				   select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" />
+
+		<Paginator
+			bind:settings={paginationSettings}
+			showFirstLastButtons={true}
+			showPreviousNextButtons={true}
+			controlVariant="variant-soft bg-white"
+			select="variant-soft bg-white p-2 border rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+		/>
 	{/if}
 </div>
 
+{#if showSolutionModal && currentSolution}
+	<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+		<div class="bg-white p-6 rounded-lg shadow-xl w-11/12 h-5/6 flex flex-col">
+			<h2 class="text-2xl font-bold mb-4">Solution for {currentSolution.problemTitle}</h2>
+			<div class="flex-grow overflow-hidden">
+				<CodeEditorViewSolution code={currentSolution.code} languageId={currentSolution.language_id} />
+			</div>
+			<div class="mt-4 flex justify-end">
+				<button on:click={closeSolutionModal}
+						class="btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+					Close
+				</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
 <style lang="postcss">
-    table thead th {
-        padding: 1.5rem;
-    }
-
-    table thead th:first-child {
-        border-top-left-radius: 0.375rem;
-        border-bottom-left-radius: 0.375rem;
-    }
-
-    table thead th:last-child {
-        border-top-right-radius: 0.375rem;
-        border-bottom-right-radius: 0.375rem;
-    }
-
-    table tbody tr:first-child td:first-child {
-        border-bottom-left-radius: 0.375rem;
-    }
-
-    table tbody tr:first-child td:last-child {
-        border-bottom-right-radius: 0.375rem;
-    }
-
     .btn.bg-solution-btn {
         @apply bg-none border-x-2 border-y-2 text-black hover:bg-indigo-600 hover:text-white hover:border-transparent py-2 px-4 rounded-md;
     }

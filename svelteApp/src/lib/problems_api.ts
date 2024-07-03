@@ -19,6 +19,7 @@ export interface ProblemSchema {
 	memory_limit: number;
 	time_limit: number;
 	restrictions: string;
+	status: string;
 }
 
 export interface TestCase {
