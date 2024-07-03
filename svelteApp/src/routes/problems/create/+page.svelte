@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { writable, derived } from 'svelte/store';
+	import { derived, writable } from 'svelte/store';
 	import CodeEditor from '../../../components/CodeEditor.svelte';
 	import type { CreateProblemPayload } from '$lib/problems_api';
 	import { createProblem, createTestCase } from '$lib/problems_api';
@@ -213,6 +213,12 @@
 	function toggleTestCaseDetails(index: number) {
 		selectedTestCase.update(current => current === index ? null : index);
 	}
+
+	function handleOutsideClick(event: MouseEvent) {
+		if (event.target === event.currentTarget) {
+			selectedTestCase.set(null);
+		}
+	}
 </script>
 
 <main class="min-h-screen bg-gray-100 pb-10">
@@ -277,13 +283,15 @@
 					</div>
 
 					<div>
-						<label class="block font-bold text-xl mb-2" for="example_input">Exemplu de Date de Intrare</label>
+						<label class="block font-bold text-xl mb-2" for="example_input">Exemplu de Date de
+							Intrare</label>
 						<textarea id="example_input" bind:value={example_input} required
 								  class="w-full px-3 py-2 border rounded-md" rows="4"></textarea>
 					</div>
 
 					<div>
-						<label class="block font-bold text-xl mb-2" for="example_output">Exemplu de Date de Ieșire</label>
+						<label class="block font-bold text-xl mb-2" for="example_output">Exemplu de Date de
+							Ieșire</label>
 						<textarea id="example_output" bind:value={example_output} required
 								  class="w-full px-3 py-2 border rounded-md" rows="4"></textarea>
 					</div>
@@ -362,7 +370,8 @@
 									></textarea>
 								</div>
 								<div class="mb-4">
-									<label class="block font-medium mb-1" for="test_case_output">Date așteptate de Ieșire</label>
+									<label class="block font-medium mb-1" for="test_case_output">Date așteptate de
+										Ieșire</label>
 									<textarea
 										id="test_case_output"
 										bind:value={$testCases[$activeTestCase].expected_output}
@@ -390,15 +399,15 @@
 									<button
 										type="button"
 										class={`px-3 py-1 rounded-full ${getVerificationColor(result.passed)} hover:opacity-80 transition-opacity`}
-										on:click={() => toggleTestCaseDetails(index)}
-									>
-										Test {index + 1}: {result.passed ? 'Passed' : 'Failed'}
+										on:click={() => toggleTestCaseDetails(index)}>
+										Test {index + 1}: {result.passed ? 'Aprobat' : 'Respins'}
 									</button>
 								{/each}
 							</div>
 
 							{#if $selectedTestCase !== null}
-								<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+								<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+									 on:click={handleOutsideClick}>
 									<div class="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto">
 										<h4 class="text-lg font-medium mb-2">
 											Test {$selectedTestCase + 1}:
@@ -422,7 +431,7 @@
 											class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
 											on:click={() => selectedTestCase.set(null)}
 										>
-											Close
+											Închide
 										</button>
 									</div>
 								</div>
@@ -433,7 +442,8 @@
 			</div>
 
 			<div class="flex justify-center mt-8">
-				<button type="submit" class="btn btn-primary px-10 py-4 text-xl bg-indigo-600 hover:bg-indigo-700" disabled={$isSubmitDisabled}>
+				<button type="submit" class="btn btn-primary px-10 py-4 text-xl bg-indigo-600 hover:bg-indigo-700"
+						disabled={$isSubmitDisabled}>
 					Creează Problemă
 				</button>
 			</div>
