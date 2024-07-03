@@ -80,10 +80,10 @@
 		const level = Math.floor(points / 10) + 1;
 
 		let rank;
-		if (points < 50) rank = 'Bronze';
-		else if (points < 100) rank = 'Silver';
-		else if (points < 200) rank = 'Gold';
-		else rank = 'Platinum';
+		if (points < 50) rank = 'Bronz';
+		else if (points < 100) rank = 'Argint';
+		else if (points < 200) rank = 'Aur';
+		else rank = 'Diamant';
 
 		return { rank, level, points };
 	}
