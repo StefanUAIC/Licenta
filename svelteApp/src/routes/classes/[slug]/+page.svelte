@@ -20,7 +20,11 @@
 	import flatpickr from 'flatpickr';
 	import 'flatpickr/dist/flatpickr.css';
 	import { type PaginationSettings, Paginator } from '@skeletonlabs/skeleton';
+	import CodeEditorViewSolution from '../../../components/CodeEditorViewSolution.svelte';
 
+	let showCodeEditor = false;
+	let currentSubmissionCode = '';
+	let currentSubmissionLanguageId = 0;
 	let classId: number;
 	let classInfo: ClassInfoResponse | null = null;
 	let homeworks: Homework[] = [];
@@ -202,7 +206,18 @@
 		}
 	}
 
-	let profilePicture= "../default-profile-picture.png";
+	let profilePicture = '../default-profile-picture.png';
+
+
+	function openCodeEditor(submission: Solution) {
+		currentSubmissionCode = submission.code;
+		currentSubmissionLanguageId = submission.language_id;
+		showCodeEditor = true;
+	}
+
+	function closeCodeEditor() {
+		showCodeEditor = false;
+	}
 </script>
 
 <template>
@@ -287,15 +302,17 @@
 							{#each students as student}
 								<tr>
 									<td class="px-6 py-1 min-h-[50px] whitespace-nowrap text-center">
-										<img src={profilePicture} alt={"Profile picture"} class="w-16 h-16 rounded-full bg-white" />
+										<img src={profilePicture} alt={"Profile picture"}
+											 class="w-16 h-16 rounded-full bg-white" />
 									</td>
 									<td class="px-6 py-1 min-h-[50px] whitespace-nowrap text-center">
 										{student.first_name} {student.last_name}
 									</td>
-									<td class="px-6 py-1 min-h-[50px] whitespace-nowrap  flex space-x-2 text-center">
+									<td class="px-6 py-1 min-h-[50px] whitespace-nowrap flex space-x-2 text-center">
 										{#each currentSubmissions.filter(submission => submission.user_id) as submission}
 											<button
-												class={`py-1 px-3 rounded ${getButtonColor(submission.percentage_passed)}`}>
+												class={`py-1 px-3 rounded ${getButtonColor(submission.percentage_passed)}`}
+												on:click={() => openCodeEditor(submission)}>
 												{submission.percentage_passed}%
 											</button>
 										{/each}
@@ -340,6 +357,23 @@
 			</button>
 		</div>
 	</Modal>
+
+	{#if showCodeEditor}
+		<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+			<div class="bg-white p-6 rounded-lg shadow-xl w-3/4 h-3/4 flex flex-col">
+				<h2 class="text-2xl font-bold mb-4">Solution Code</h2>
+				<div class="flex-grow overflow-hidden">
+					<CodeEditorViewSolution code={currentSubmissionCode} languageId={currentSubmissionLanguageId} />
+				</div>
+				<div class="mt-4 flex justify-end">
+					<button on:click={closeCodeEditor}
+							class="btn bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
 </template>
 
 <style>
