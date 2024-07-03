@@ -224,10 +224,10 @@ def list_teacher_problems(request, user_id: int):
 
 @user_router.get('/{user_id}/solutions', auth=jwt_auth, response={200: List[SolutionSchema], 400: dict})
 def list_user_solutions(request, user_id: int):
-    user = request.user
+    target_user = User.objects.get(id=user_id)
 
     solutions = Solution.objects.filter(
-        user=user,
+        user=target_user,
         problem__status='ACCEPTED'
     ).select_related('problem')
 
@@ -282,7 +282,7 @@ def get_user_count(request, role: Literal['all', 'student', 'teacher']):
 @user_router.get('/', auth=jwt_auth, response={200: List[int], 500: ErrorResponseSchema})
 def get_all_users_ids(request):
     try:
-        user_ids = User.objects.values_list('id', flat=True)
+        user_ids = User.objects.filter(is_superuser=False).values_list('id', flat=True)
         return 200, list(user_ids)
     except Exception as e:
         return 500, {"errors": [ErrorDetailSchema(field="non_field_errors", message=str(e))]}
