@@ -35,7 +35,7 @@
 		}
 		try {
 			await reportIssue({ title, description });
-			alert('You have successfully sent the issue to the admin.');
+			alert('Ai trimis cu succes eroarea către administrator! Mulțumim!');
 			title = '';
 			description = '';
 			onClose();
@@ -50,14 +50,14 @@
 	<div class="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-md mx-auto max-h-full overflow-y-auto"
 		 class:hidden={!isOpen}>
 		<div class="flex justify-between items-center mb-4">
-			<h2 class="text-xl font-bold">Report an Issue</h2>
+			<h2 class="text-xl font-bold">Raportează o eroare</h2>
 			<button class="text-white bg-red-500 hover:bg-red-700 rounded-full w-8 h-8 flex items-center justify-center"
 					on:click={onClose}>
 				✖
 			</button>
 		</div>
 		<div class="mb-4">
-			<label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+			<label for="title" class="block text-sm font-medium text-gray-700">Titlu</label>
 			<input type="text" id="title" bind:value={title}
 				   class="px-1 py-1 mt-1 block w-full rounded-md border border-gray-300 shadow-sm">
 			{#if $titleError}
@@ -65,7 +65,7 @@
 			{/if}
 		</div>
 		<div class="mb-4">
-			<label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+			<label for="description" class="block text-sm font-medium text-gray-700">Descriere</label>
 			<textarea id="description" bind:value={description}
 					  class="px-1 py-1 mt-1 block w-full rounded-md border border-gray-300 shadow-sm"></textarea>
 			{#if $descriptionError}
@@ -74,7 +74,7 @@
 		</div>
 		<button on:click={handleSubmit}
 				class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded justify-center">
-			Send
+			Trimite
 		</button>
 	</div>
 </div>
