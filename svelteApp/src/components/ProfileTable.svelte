@@ -201,15 +201,15 @@
 	function getEmptyMessage(tab: string): string {
 		switch (tab) {
 			case 'sentSolutions':
-				return 'You haven\'t submitted any solutions yet.';
+				return 'Nu ai trimis incă nicio soluție.';
 			case 'problemsProposed':
-				return 'You haven\'t proposed any problems yet.';
+				return 'Nu ai propus încă nicio problemă.';
 			case 'myClasses':
-				return 'You\'re not enrolled in any classes yet.';
+				return 'Nu te-ai înscris încă în nicio clasă.';
 			case 'myHomeworks':
-				return 'You haven\'t received any homeworks yet.';
+				return 'Nu ai primit încă nicio temă.';
 			default:
-				return 'No data available.';
+				return 'Nicio informație disponibilă';
 		}
 	}
 </script>
